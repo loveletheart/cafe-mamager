@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Menu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        .categories {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            padding: 10px 0;
+            border-top: 3px solid black;
+            border-bottom: 3px solid black;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+        .categories a {
+            flex: 1;
+            margin: 0 10px;
+            padding: 10px;
+            text-decoration: none;
+            color: black;
+            font-size: 20px;
+            font-family: 'Arial', sans-serif;
+            font-weight: bold;
+            border: 1px solid gray;
+            border-radius: 15px;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .categories a:hover {
+            text-decoration: underline;
+        }
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding: 20px;
+        }
+        .menu-item {
+            border: 1px solid gray;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Menu</h1>
+
+    <div class="categories">
+        <a th:href="@{/menu/coffee}" th:text="'커피'"></a>
+        <a th:href="@{/menu/aid}" th:text="'에이드'"></a>
+        <a th:href="@{/menu/cookie}" th:text="'쿠키'"></a>
+        <a th:href="@{/menu/bread}" th:text="'빵'"></a>
+        <a th:href="@{/menu/cake}" th:text="'케이크'"></a>
+    </div>
+    
+    <div class="menu-grid">
+        <div class="menu-item" th:each="menu : ${menus}">
+            <p>Menu Name: <span th:text="${menu.menuName}">Menu Name</span></p>
+            <p>Menu Price: <span th:text="${menu.price}">Menu Price</span></p>
+        </div>
+    </div>
+    
+    <div th:if="${menus.isEmpty()}">
+        <p>No menu items found</p>
+    </div>
+</body>
+</html>
