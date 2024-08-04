@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.*;
+import java.util.List;
 
 @Controller
 @RequestMapping("/menu")
@@ -20,50 +20,39 @@ public class MenuController {
 
     @GetMapping
     public ModelAndView getMenu() {
-    	 List<Menu> menus = menuService.getMenuByValue("coffee");//데이터베이스에서 coffee라는 조건으로 검색
-         ModelAndView modelAndView = new ModelAndView("coffee");
-         System.out.println("Fetched menus: " + menus);
-         modelAndView.addObject("menus", menus);
-         return modelAndView;
+    	return getMenu("coffee");
     }
 
     @GetMapping("/coffee")
     public ModelAndView getCoffee() {
-        List<Menu> menus = menuService.getMenuByValue("coffee");
-        ModelAndView modelAndView = new ModelAndView("coffee");
-        modelAndView.addObject("menus", menus);
-        return modelAndView;
+        return getMenu("coffee");
     }
     
     @GetMapping("/aid")
     public ModelAndView getAid() {
-        List<Menu> menus = menuService.getMenuByValue("aid");
-        ModelAndView modelAndView = new ModelAndView("aid");
-        modelAndView.addObject("menus", menus);
-        return modelAndView;
+        return getMenu("aid");
     }
     
     @GetMapping("/cookie")
     public ModelAndView getCookie() {
-        List<Menu> menus = menuService.getMenuByValue("cookie");
-        ModelAndView modelAndView = new ModelAndView("cookie");
-        modelAndView.addObject("menus", menus);
-        return modelAndView;
+        return getMenu("cookie");
     }
     
     @GetMapping("/bread")
     public ModelAndView getBread() {
-        List<Menu> menus = menuService.getMenuByValue("bread");
-        ModelAndView modelAndView = new ModelAndView("bread");
-        modelAndView.addObject("menus", menus);
-        return modelAndView;
+        return getMenu("bread");
     }
     
     @GetMapping("/cake")
     public ModelAndView getCake() {
-        List<Menu> menus = menuService.getMenuByValue("cake");
-        ModelAndView modelAndView = new ModelAndView("cake");
+        return getMenu("cake");
+    }
+    
+    private ModelAndView getMenu(String category) {
+        List<Menu> menus = menuService.getMenuByValue(category);// 데이터베이스에서 category라는 조건으로 검색
+        ModelAndView modelAndView = new ModelAndView(category);
         modelAndView.addObject("menus", menus);
+        modelAndView.addObject("activeCategory", category);
         return modelAndView;
     }
 }

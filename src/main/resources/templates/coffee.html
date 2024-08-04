@@ -9,16 +9,16 @@
             margin: 0;
             padding: 0;
             text-align: center;
+            background-color: white; /* Ensure the body background is white */
         }
         .categories {
             margin-top: 20px;
             margin-bottom: 20px;
             padding: 10px 0;
-            border-top: 3px solid black;
-            border-bottom: 3px solid black;
+            border-top: 3px solid rgba(255, 255, 255, 0.1); /* Border with white transparency */
+            border-bottom: 3px solid rgba(255, 255, 255, 0.1); /* Border with white transparency */
             display: flex;
             justify-content: space-around;
-            text-align: center;
         }
         .categories a {
             flex: 1;
@@ -29,17 +29,21 @@
             font-size: 20px;
             font-family: 'Arial', sans-serif;
             font-weight: bold;
-            border: 1px solid gray;
+            border: 1px solid white; /* Set border color to white */
             border-radius: 15px;
             background-color: #f0f0f0;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-top: 10px;
-            margin-bottom: 10px;
+            transition: background-color 0.3s;
         }
         .categories a:hover {
             text-decoration: underline;
+        }
+        .categories .active {
+            background-color: white; /* Active category background color */
+            color: black;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .menu-grid {
             display: grid;
@@ -59,11 +63,11 @@
     <h1>Menu</h1>
 
     <div class="categories">
-        <a th:href="@{/menu/coffee}" th:text="'커피'"></a>
-        <a th:href="@{/menu/aid}" th:text="'에이드'"></a>
-        <a th:href="@{/menu/cookie}" th:text="'쿠키'"></a>
-        <a th:href="@{/menu/bread}" th:text="'빵'"></a>
-        <a th:href="@{/menu/cake}" th:text="'케이크'"></a>
+        <a th:href="@{/menu/coffee}" th:text="'커피'" th:classappend="${activeCategory == 'coffee'} ? 'active'"></a>
+        <a th:href="@{/menu/aid}" th:text="'에이드'" th:classappend="${activeCategory == 'aid'} ? 'active'"></a>
+        <a th:href="@{/menu/cookie}" th:text="'쿠키'" th:classappend="${activeCategory == 'cookie'} ? 'active'"></a>
+        <a th:href="@{/menu/bread}" th:text="'빵'" th:classappend="${activeCategory == 'bread'} ? 'active'"></a>
+        <a th:href="@{/menu/cake}" th:text="'케이크'" th:classappend="${activeCategory == 'cake'} ? 'active'"></a>
     </div>
     
     <div class="menu-grid">
