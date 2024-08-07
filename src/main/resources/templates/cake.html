@@ -13,7 +13,7 @@
         }
         .categories {
             margin-top: 20px;
-            margin-bottom: 20px;
+            margin-bottom: 0px;
             padding: 10px 0;
             border-top: 3px solid rgba(255, 255, 255, 0.1); /* Border with white transparency */
             border-bottom: 3px solid rgba(255, 255, 255, 0.1); /* Border with white transparency */
@@ -24,10 +24,9 @@
         .categories a {
             flex: 1;
             margin: 0 10px;
-            padding: 10px;
             text-decoration: none;
             color: black;
-            font-size: 20px;
+            font-size: 25px;
             font-family: 'Arial', sans-serif;
             font-weight: bold;
             border: 1px solid #cae1f2;; /* Set border color to white */
@@ -36,15 +35,17 @@
             align-items: center;
             justify-content: center;
             background-color: #cae1f2;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, padding 0.3s; /* Add transition for padding */
         }
         .categories a:hover {
             text-decoration: underline;
+            text-underline-position : from-font;
         }
-        .categories .active {
+        .categories a.active {
             background-color: white; /* Active category background color */
             color: black;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 0 !important; /* Remove bottom margin */
         }
         .menu-grid {
             display: grid;
