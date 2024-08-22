@@ -74,7 +74,7 @@
     
     <div class="menu-grid">
         <div class="menu-item" th:each="menu : ${menus}">
-        	<img src="/images/${menu.menunameen}.jpg" alt="${menu.menunameen}" style="width:300px;height:auto;">
+        	<img th:src="@{|/images/${menu.menuNameen}.jpg|}" th:alt="${menu.menuNameen}" style="width:300px;height:auto;"><!-- 표현식 처리를 해결하기 위해 리터널 블록 사용 -->
             <p>Menu Name: <span th:text="${menu.menuName}">Menu Name</span></p>
             <p>Menu Price: <span th:text="${menu.price}">Menu Price</span></p>
         </div>
