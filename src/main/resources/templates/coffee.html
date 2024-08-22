@@ -80,6 +80,27 @@
         </div>
     </div>
     
+    <div th:if="${totalPages > 1}">
+        <nav>
+            <ul class="pagination">
+                <li th:classappend="${currentPage == 0} ? 'disabled'">
+                    <a th:href="@{/${activeCategory}(page=${currentPage - 1})}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                    th:classappend="${i == currentPage} ? 'active'">
+                    <a th:href="@{/${activeCategory}(page=${i})}" th:text="${i + 1}">1</a>
+                </li>
+                <li th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
+                    <a th:href="@{/${activeCategory}(page=${currentPage + 1})}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    
     <div th:if="${menus.isEmpty()}">
         <p>No menu items found</p>
     </div>
