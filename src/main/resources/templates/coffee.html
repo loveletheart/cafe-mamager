@@ -82,23 +82,25 @@
     
     <div th:if="${totalPages > 1}">
         <nav>
-            <ul class="pagination">
-                <li th:classappend="${currentPage == 0} ? 'disabled'">
-                    <a th:href="@{/${activeCategory}(page=${currentPage - 1})}" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-                <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-                    th:classappend="${i == currentPage} ? 'active'">
-                    <a th:href="@{/${activeCategory}(page=${i})}" th:text="${i + 1}">1</a>
-                </li>
-                <li th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
-                    <a th:href="@{/${activeCategory}(page=${currentPage + 1})}" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+           <div class="pagination">
+			    <ul>
+			        <!-- Previous Page Link -->
+			        <li th:if="${currentPage > 0}">
+			            <a th:href="@{|/menu/${activeCategory}?page=${currentPage - 1}|}">Previous</a>
+			        </li>
+			
+			        <!-- Page Number Links -->
+			        <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+			            <a th:href="@{|/menu/${activeCategory}?page=${i}|}" th:text="${i + 1}" th:classappend="${i == currentPage} ? ' active'"></a>
+			        </li>
+			
+			        <!-- Next Page Link -->
+			        <li th:if="${currentPage < totalPages - 1}">
+			            <a th:href="@{|/menu/${activeCategory}?page=${currentPage + 1}|}">Next</a>
+			        </li>
+			    </ul>
+			</div>
+		</nav>
     </div>
     
     <div th:if="${menus.isEmpty()}">

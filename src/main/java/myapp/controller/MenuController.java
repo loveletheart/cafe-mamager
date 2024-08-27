@@ -11,8 +11,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.data.domain.Page;
 
-import java.util.List;
-
 @Controller
 @RequestMapping("/menu")
 public class MenuController {
@@ -53,15 +51,13 @@ public class MenuController {
     private ModelAndView getMenu(String category,@RequestParam(defaultValue = "0") int page) {
     	
     	int pageSize = 12; // Number of items per page
-        Page<Menu> menuPage = menuService.getMenuByCategory(category, page, pageSize);//데이터베이스에 메뉴의 개수 확인용
-        
-        List<Menu> menus = menuService.getMenuByValue(category);// 데이터베이스에서 category라는 조건으로 검색
+        Page<Menu> menuPage = menuService.getMenuByCategory(category, page,pageSize);//데이터베이스에 메뉴의 개수 확인 및 가져오기
         ModelAndView modelAndView = new ModelAndView(category);
-        modelAndView.addObject("menus", menus);//menus에 맞는 데이터 저장
+        modelAndView.addObject("menus", menuPage.getContent());//menus에 맞는 데이터 저장
         modelAndView.addObject("activeCategory", category);//카테고리에 맞는 버튼 색상 뒷배경과 통일
         modelAndView.addObject("totalPages", menuPage.getTotalPages()); // 전체페이지 수
         modelAndView.addObject("currentPage", page); // 현재 페이지
-        modelAndView.addObject("activeCategory", category); // Highlight the active category
+        System.out.println("Menus on current page: " + menuPage.getContent().size());
         return modelAndView;
     }
 }
