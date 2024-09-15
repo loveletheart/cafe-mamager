@@ -59,6 +59,14 @@
             border-radius: 10px;
             background-color: #f9f9f9;
         }
+        .pagination li {
+		    display: inline-block;
+		    margin-right: 10px; /* Adjust the spacing as needed */
+		}
+		.pagination li a {
+			text-decoration:none;
+			font-size: 40px;
+		}
     </style>
 </head>
 <body>
@@ -86,7 +94,7 @@
 			    <ul>
 			        <!-- Previous Page Link -->
 			        <li th:if="${currentPage > 0}">
-			            <a th:href="@{|/menu/${activeCategory}?page=${currentPage - 1}|}">Previous</a>
+						<a th:href="@{|/menu/${activeCategory}?page=${currentPage - 1}|}" >＜</a>
 			        </li>
 			
 			        <!-- Page Number Links -->
@@ -96,7 +104,7 @@
 			
 			        <!-- Next Page Link -->
 			        <li th:if="${currentPage < totalPages - 1}">
-			            <a th:href="@{|/menu/${activeCategory}?page=${currentPage + 1}|}">Next</a>
+			            <a th:href="@{|/menu/${activeCategory}?page=${currentPage + 1}|}">＞</a>
 			        </li>
 			    </ul>
 			</div>
