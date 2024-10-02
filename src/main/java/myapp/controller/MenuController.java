@@ -1,18 +1,18 @@
 package myapp.controller;
 
-import myapp.entity.Menu;
+import myapp.entity.*;
 import myapp.service.MenuService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import java.util.*;
 
 @Controller
+@RestController
 @RequestMapping("/menu")
 public class MenuController {
 
@@ -60,5 +60,17 @@ public class MenuController {
         modelAndView.addObject("currentPage", page); // 현재 페이지
         System.out.println("Menus on current page: " + menuPage.getContent().size());
         return modelAndView;
+    }
+    
+    @PostMapping("/add")
+    public ResponseEntity<String> addToCart(@RequestBody Cart cart) {
+        System.out.print(cart.getMenuName());
+        boolean result = menuService.addToCart(cart.getMenuName());
+        
+        if (result) {
+            return ResponseEntity.ok("상품이 장바구니에 추가되었습니다.");
+        } else {
+            return ResponseEntity.status(500).body("장바구니 추가에 실패했습니다.");
+        }
     }
 }

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Menu</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery가 반드시 먼저 로드되어야 함 -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -85,6 +86,7 @@
         	<img th:src="@{|/images/${menu.menuNameen}.jpg|}" th:alt="${menu.menuNameen}" style="width:300px;height:auto;"><!-- 표현식 처리를 해결하기 위해 리터널 블록 사용 -->
             <p>Menu Name: <span th:text="${menu.menuName}">Menu Name</span></p>
             <p>Menu Price: <span th:text="${menu.price}">Menu Price</span></p>
+            <button th:data-menuName='${menu.menuName}'>장바구니에 담기</button>
         </div>
     </div>
     
@@ -114,5 +116,31 @@
     <div th:if="${menus.isEmpty()}">
         <p>No menu items found</p>
     </div>
+    
+    <script>
+		$(document).ready(function() {
+	        // addToCart 함수 정의
+	        window.addToCart = function(menuName) {
+	            $.ajax({
+	                type: 'POST',
+	                url: '/menu/add',
+	                data: JSON.stringify({ menuName: menuName }),
+	                contentType: 'application/json',
+	                success: function(response) {
+	                    alert("상품이 장바구니에 추가되었습니다.");
+	                },
+	                error: function(xhr, status, error) {
+	                    alert("장바구니 추가에 실패했습니다.");
+	                }
+	            });
+	        };
+	
+		// 버튼 클릭 이벤트 바인딩 (onclick을 대체)
+		$('button').click(function() {
+			const menuName = $(this).attr('data-menuName');  // 버튼의 data 속성에서 menuName 가져오기
+		    addToCart(menuName);
+		    });
+		});
+    </script>
 </body>
 </html>
