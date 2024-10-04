@@ -12,11 +12,13 @@ public class Cart {
 	    private String menu_Nameen;
 	    private String type;
 	    private int price;
-	    private int quantity;
 	    
-	    public Cart(String menu_Name, int quantity, int price) {  // price는 double
-	        this.menu_Name = menu_Name;
-	        this.quantity = quantity;
+	    protected Cart() {}
+	    
+	    public Cart(String menu_Name,String menu_Nameen,String type,int price) {  // price는 double
+	    	this.menu_Name = menu_Name;
+	        this.menu_Nameen = menu_Nameen;
+	        this.type = type;
 	        this.price = price;
 	    }
 
@@ -51,13 +53,5 @@ public class Cart {
 
 	    public void setPrice(int price) {
 	        this.price = price;
-	    }
-	    
-	    public int getQuantity() {
-	        return quantity;
-	    }
-
-	    public void setQuantity(int quantity) {
-	        this.quantity = quantity;
 	    }
 }

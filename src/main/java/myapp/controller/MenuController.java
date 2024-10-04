@@ -64,7 +64,6 @@ public class MenuController {
     
     @PostMapping("/add")
     public ResponseEntity<String> addToCart(@RequestBody Cart cart) {
-        System.out.print(cart.getMenuName());
         boolean result = menuService.addToCart(cart.getMenuName());
         
         if (result) {
