@@ -22,10 +22,16 @@ public class MenuService {
         return menuRepository.findByPage(category, pageRequest);
     }
     
-    public boolean addToCart(String menu_Name) {
-    	Optional<Menu> menuItem = menuRepository.findById(menu_Name);
+    public boolean addToCart(String menuName) {
+    	Optional<Menu> menuItem = menuRepository.findById(menuName);
+    	Cart existingCart = cartRepository.findByMenuName(menuName);
     	
-    	if (menuItem.isPresent()) {
+    	if (existingCart != null && menuItem.isPresent()) {
+    		
+    		existingCart.setCount(existingCart.getCount() + 1);
+            cartRepository.save(existingCart);
+            return true;
+    	}else if(existingCart == null && menuItem.isPresent()) {
             Menu menu = menuItem.get();
             String id="1";
 
@@ -34,8 +40,6 @@ public class MenuService {
             cartRepository.save(cart);
 
             return true;  // 저장 성공 시 true 반환
-        } else {
-            return false;  // Menu 테이블에서 해당 메뉴를 찾지 못한 경우
-        }
+        } else return false;  // Menu 테이블에서 해당 메뉴를 찾지 못한 경우
     }
 }

@@ -8,36 +8,42 @@ import jakarta.persistence.*;
 public class Cart {
 	
 	 	@Id
+	 	@Column(name = "menu_name")
+	    private String menuName;//해당 순서에 맞추어서 데이터에서 검색함
+	 	
 	 	private String id;
-	    private String menu_Name;//해당 순서에 맞추어서 데이터에서 검색함
-	    private String menu_Nameen;
-	    private int count;
+	 	
+	 	@Column(name = "menu_nameen")
+	    private String menuNameen;
+	 	
+	 	private int count;
+	 	
 	    private int price;
 	    
-	    protected Cart() {}
+	    public Cart() {}
 	    
-	    public Cart(String id,String menu_Name,String menu_Nameen,int count,int price) {  //데이터를 받아서 넣을 값을 지정
+	    public Cart(String id,String menuName,String menuNameen,int count,int price) {  //데이터를 받아서 넣을 값을 지정
 	    	this.id = id;
-	    	this.menu_Name = menu_Name;
-	        this.menu_Nameen = menu_Nameen;
+	    	this.menuName = menuName;
+	        this.menuNameen = menuNameen;
 	        this.count = count;
 	        this.price = price;
 	    }
 
 	    public String getMenuName() {
-	        return menu_Name;
+	        return menuName;
 	    }
 
-	    public void setMenuName(String menu_Name) {
-	        this.menu_Name = menu_Name;
+	    public void setMenuName(String menuName) {
+	        this.menuName = menuName;
 	    }
 	    
 	    public String getMenuNameen() {
-	        return menu_Nameen;
+	        return menuNameen;
 	    }
 
-	    public void setMenuNameen(String menu_Nameen) {
-	        this.menu_Nameen = menu_Nameen;
+	    public void setMenuNameen(String menuNameen) {
+	        this.menuNameen = menuNameen;
 	    }
 	    
 	    public int getCount() {
