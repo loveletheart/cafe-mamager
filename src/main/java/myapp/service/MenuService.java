@@ -27,9 +27,10 @@ public class MenuService {
     	
     	if (menuItem.isPresent()) {
             Menu menu = menuItem.get();
+            String id="1";
 
             // Cart 엔티티 생성 후 저장
-            Cart cart =new Cart(menu.getMenuName(),menu.getMenuNameen(),menu.getMenu(),menu.getPrice());  // 예: 기본적으로 1개의 수량 저장
+            Cart cart =new Cart(id,menu.getMenuName(),menu.getMenuNameen(),1,menu.getPrice());  // 테이블id,메뉴 이름,메뉴 영어이름,메뉴개수,메뉴 가격
             cartRepository.save(cart);
 
             return true;  // 저장 성공 시 true 반환

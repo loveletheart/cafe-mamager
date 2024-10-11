@@ -8,27 +8,20 @@ import jakarta.persistence.*;
 public class Cart {
 	
 	 	@Id
+	 	private String id;
 	    private String menu_Name;//해당 순서에 맞추어서 데이터에서 검색함
 	    private String menu_Nameen;
-	    private String type;
+	    private int count;
 	    private int price;
 	    
 	    protected Cart() {}
 	    
-	    public Cart(String menu_Name,String menu_Nameen,String type,int price) {  // price는 double
+	    public Cart(String id,String menu_Name,String menu_Nameen,int count,int price) {  //데이터를 받아서 넣을 값을 지정
+	    	this.id = id;
 	    	this.menu_Name = menu_Name;
 	        this.menu_Nameen = menu_Nameen;
-	        this.type = type;
+	        this.count = count;
 	        this.price = price;
-	    }
-
-	    // Getters and Setters
-	    public String getMenu() {
-	        return type;
-	    }
-
-	    public void setMenu(String type) {
-	        this.type = type;
 	    }
 
 	    public String getMenuName() {
@@ -46,7 +39,15 @@ public class Cart {
 	    public void setMenuNameen(String menu_Nameen) {
 	        this.menu_Nameen = menu_Nameen;
 	    }
+	    
+	    public int getCount() {
+	        return count;
+	    }
 
+	    public void setCount(int count) {
+	        this.count = count;
+	    }
+	    
 	    public int getPrice() {
 	        return price;
 	    }
