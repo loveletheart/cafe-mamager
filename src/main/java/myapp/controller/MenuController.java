@@ -5,6 +5,7 @@ import myapp.service.MenuService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.data.domain.Page;
@@ -62,7 +63,7 @@ public class MenuController {
         return modelAndView;
     }
     
-    @PostMapping("/add")
+    @PostMapping("/add")//장바구니 버튼 클릭시 실행
     public ResponseEntity<String> addToCart(@RequestBody Cart cart) {
         boolean result = menuService.addToCart(cart.getMenuName());
         
@@ -71,5 +72,13 @@ public class MenuController {
         } else {
             return ResponseEntity.status(500).body("장바구니 추가에 실패했습니다.");
         }
+    }
+    
+    // 장바구니 페이지로 이동
+    @GetMapping("/cart")
+    public String viewCart(Model model) {
+        List<Cart> cartItems = menuService.getAllCartItems();
+        model.addAttribute("cartItems", cartItems); // cartItems로 데이터를 전달
+        return "cart";  // cart.html로 이동
     }
 }

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>장바구니</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <h1>장바구니</h1>
+    <p th:text="${cartItems.size()}">Cart size will appear here</p>
+
+    <table>
+    <thead>
+        <tr>
+            <th>Menu Name</th>
+            <th>Menu Name (EN)</th>
+            <th>Count</th>
+            <th>Price</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="cartItem : ${cartItems}">
+            <td th:text="${cartItem.menuName}">메뉴 이름</td>
+            <td th:text="${cartItem.menuNameen}">메뉴 영어 이름</td>
+            <td th:text="${cartItem.count}">수량</td>
+            <td th:text="${cartItem.price}">가격</td>
+            <td th:text="${cartItem.count * cartItem.price}">총 가격</td>
+        </tr>
+    </tbody>
+</table>
+
+
+    <a href="/menu">메뉴로 돌아가기</a>
+</body>
+</html>
