@@ -76,9 +76,10 @@ public class MenuController {
     
     // 장바구니 페이지로 이동
     @GetMapping("/cart")
-    public String viewCart(Model model) {
+    public ModelAndView showCart() {
         List<Cart> cartItems = menuService.getAllCartItems();
-        model.addAttribute("cartItems", cartItems); // cartItems로 데이터를 전달
-        return "cart";  // cart.html로 이동
+        ModelAndView mav = new ModelAndView("cart");
+        mav.addObject("cartItems", cartItems);
+        return mav;
     }
 }
