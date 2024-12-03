@@ -110,5 +110,60 @@
         <a href="/menu" class="back-button">메뉴로 돌아가기</a>
         <a href="/menu" class="payment-button">결제하기(미구현)</a>
     </div>
+    
+    <script>
+	    document.addEventListener('DOMContentLoaded', function () {
+	    	
+	        // 수량 증가 버튼
+	        document.querySelectorAll('.increase-btn').forEach(button => {
+	            button.addEventListener('click', function () {
+	                const row = this.closest('tr');
+	                const itemId = row.getAttribute('data-id');
+	                const countInput = row.querySelector('.item-count');
+	                const newCount = parseInt(countInput.value) + 1;
+	
+	                updateItemCount(itemId, newCount, countInput);
+	            });
+	        });
+	
+	        // 수량 감소 버튼
+	        document.querySelectorAll('.decrease-btn').forEach(button => {
+	            button.addEventListener('click', function () {
+	                const row = this.closest('tr');
+	                const itemId = row.getAttribute('data-id');
+	                const countInput = row.querySelector('.item-count');
+	                const newCount = Math.max(parseInt(countInput.value) - 1, 1);
+	
+	                updateItemCount(itemId, newCount, countInput);
+	            });
+	        });
+	
+	        // AJAX로 수량 업데이트
+	        function updateItemCount(itemId, newCount, countInput) {
+	            fetch('/cart/update', {
+	                method: 'POST',
+	                headers: { 'Content-Type': 'application/json' },
+	                body: JSON.stringify({ id: itemId, count: newCount })
+	            })
+	            .then(response => response.json())
+	            .then(data => {
+	                if (data.success) {
+	                    countInput.value = newCount;
+	                    const totalCell = countInput.closest('tr').querySelector('td:nth-last-child(1)');
+	                    totalCell.textContent = data.updatedPrice;
+	                    updateTotalSum(data.totalSum);
+	                } else {
+	                    alert('수량 업데이트에 실패했습니다.');
+	                }
+	            })
+	            .catch(err => console.error(err));
+	        }
+	
+	        // 총합 금액 업데이트
+	        function updateTotalSum(newTotalSum) {
+	            document.getElementById('total-sum').textContent = newTotalSum + ' 원';
+	        }
+	    });
+    </script>
 </body>
 </html>

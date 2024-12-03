@@ -86,4 +86,32 @@ public class MenuController {
         mav.addObject("totalPrice", totalPrice);
         return mav;
     }
+    
+    @PostMapping("/cart/update")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> updateCartItem(@RequestBody Map<String, Object> request) {
+        Optional<Cart> cartItemOpt = cartupdate.findById(request.getId());
+
+        if (cartItemOpt.isPresent()) {
+            Cart cartItem = cartItemOpt.get();
+            cartItem.setCount(request.getCount());
+            cartupdate.save(cartItem);
+
+            // 계산된 금액 및 전체 금액 반환
+            int updatedPrice = cartItem.getCount() * cartItem.getPrice();
+            int totalSum = cartupdate.findAll()
+                .stream()
+                .mapToInt(item -> item.getCount() * item.getPrice())
+                .sum();
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("updatedPrice", updatedPrice);
+            response.put("totalSum", totalSum);
+
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("success", false));
+        }
+    }
 }
