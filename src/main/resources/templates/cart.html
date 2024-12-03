@@ -18,7 +18,10 @@
 		}
 		
 		table {
+			border: 1px solid #ccc;
 		    border-collapse: collapse;   /* 테이블 경계 선을 겹쳐서 표시 */
+		    width: 95%;
+		    margin: 0 auto;
 		}
 		
 		th, td {
@@ -38,30 +41,63 @@
 		    cursor: pointer;               /* 커서를 포인터로 변경 */
 		    transition: background-color 0.3s ease; /* 호버 시 배경색 전환 효과 */
 		}
+		.payment-button {
+		    display: inline-block;         /* 버튼처럼 보이게 설정 */
+		    padding: 12px 24px;            /* 버튼 내부 여백 */
+		    font-size: 16px;               /* 글자 크기 */
+		    color: white;                  /* 글자 색상 */
+		    background-color: #2699E6;     /* 버튼 배경색 (파란색 계열) */
+		    border: none;                  /* 테두리 제거 */
+		    border-radius: 20px;           /* 모서리 둥글게 */
+		    text-decoration: none;         /* 링크 밑줄 제거 */
+		    cursor: pointer;               /* 커서를 포인터로 변경 */
+		    transition: background-color 0.3s ease; /* 호버 시 배경색 전환 효과 */
+		}
+		div[style*="margin-top: 100px;"] p {
+	        margin: 0;
+	        color: #333;
+    	}
     </style>
 </head>
 <body>
     <h1 class="main_text">장바구니</h1>
     
-    <div th:if="${cartItems.size() > 0}" class="center_table">
+    <div th:if="${cartItems.size() > 0}" class="center_table" style="display: flex; flex-direction: column; align-items: center;">
         <table>
             <thead>
                 <tr>
                     <th>메뉴 이름</th>
                     <th>수량</th>
                     <th>가격</th>
-                    <th>총가격</th>
                 </tr>
             </thead>
             <tbody>
                 <!-- 장바구니 항목 반복 출력 -->
                 <tr th:each="cartItem : ${cartItems}">
-                    <td th:text="${cartItem.menuName}">메뉴 이름</td>
-                    <td th:text="${cartItem.count}">수량</td>
+                	<td>
+	                	<span style="display: flex; align-items: center;">
+				            <img th:src="@{|/images/${cartItem.menuNameen}.jpg|}" 
+				                 th:alt="${cartItem.menuNameen}" 
+				                 style="width:100px; height:100px; margin-right: 10px;">
+				            <span th:text="${cartItem.menuName}" style="margin: 10 auto;">메뉴 이름</span>
+				        </span>
+                	</td>
+                   	<td>
+	                    <button class="decrease-btn">-</button>
+				        <input type="number" class="item-count" th:value="${cartItem.count}" min="1">
+				        <button class="increase-btn">+</button>
+                    </td>
                     <td th:text="${cartItem.price}">가격</td>
                 </tr>
             </tbody>
         </table>
+        
+        <!-- 전체 총합 -->
+		<div style="margin-top: 20px;">
+	        <p style="font-size: 18px; font-weight: bold; font-size: 25px;">
+	            결제 총 금액: <span th:text="${totalPrice}">0</span>원
+	        </p>
+	    </div>
     </div>
     
     <!-- 장바구니에 아무것도 없을 때 -->
@@ -72,6 +108,7 @@
     <!-- menu 페이지로 이동하는 버튼 -->
     <div style="margin-top: 20px; text-align: center;">
         <a href="/menu" class="back-button">메뉴로 돌아가기</a>
+        <a href="/menu" class="payment-button">결제하기(미구현)</a>
     </div>
 </body>
 </html>
