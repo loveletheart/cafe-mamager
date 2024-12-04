@@ -48,5 +48,26 @@ public class MenuService {
         return cartRepository.findAll();
     }
     
-    
+    public boolean updateItemCount(String id, int count) {
+        Optional<Cart> cartItem = cartRepository.findById(id);
+
+        if (cartItem.isPresent()) {
+            Cart item = cartItem.get();
+            item.setCount(count);
+            cartRepository.save(item);
+            return true;
+        }
+        return false;
+    }
+
+    public int calculateItemPrice(String id) {
+        Optional<Cart> cartItem = cartRepository.findById(id);
+
+        return cartItem.map(item -> item.getPrice() * item.getCount()).orElse(0);
+    }
+
+    public int calculateTotalSum() {
+        List<Cart> cartItems = cartRepository.findAll();
+        return cartItems.stream().mapToInt(item -> item.getPrice() * item.getCount()).sum();
+    }
 }

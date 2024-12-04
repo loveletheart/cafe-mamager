@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import java.util.*;
 
@@ -90,28 +91,23 @@ public class MenuController {
     @PostMapping("/cart/update")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> updateCartItem(@RequestBody Map<String, Object> request) {
-        Optional<Cart> cartItemOpt = cartupdate.findById(request.getId());
+        String id = (String) request.get("id");
+        int count = (int) request.get("count");
 
-        if (cartItemOpt.isPresent()) {
-            Cart cartItem = cartItemOpt.get();
-            cartItem.setCount(request.getCount());
-            cartupdate.save(cartItem);
+        // 수량 업데이트 및 가격 계산
+        boolean success = menuService.updateItemCount(id, count);
+        Map<String, Object> response = new HashMap<>();
 
-            // 계산된 금액 및 전체 금액 반환
-            int updatedPrice = cartItem.getCount() * cartItem.getPrice();
-            int totalSum = cartupdate.findAll()
-                .stream()
-                .mapToInt(item -> item.getCount() * item.getPrice())
-                .sum();
-
-            Map<String, Object> response = new HashMap<>();
+        if (success) {
+            int updatedPrice = menuService.calculateItemPrice(id);
+            int totalSum = menuService.calculateTotalSum();
             response.put("success", true);
             response.put("updatedPrice", updatedPrice);
             response.put("totalSum", totalSum);
-
-            return ResponseEntity.ok(response);
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("success", false));
+            response.put("success", false);
         }
+
+        return ResponseEntity.ok(response);
     }
 }

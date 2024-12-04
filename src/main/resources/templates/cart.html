@@ -57,6 +57,43 @@
 	        margin: 0;
 	        color: #333;
     	}
+    	input[type="number"]::-webkit-inner-spin-button, 
+		input[type="number"]::-webkit-outer-spin-button {
+		    -webkit-appearance: none;
+		    margin: 0;
+		}
+		.quantity-control {
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		    gap: 5px; /* 버튼과 숫자 간격 */
+		}
+		
+		.quantity-control input {
+		    width: 40px;
+		    text-align: center;
+		    border: none; /* 테두리 제거 */
+		    background-color: transparent; /* 투명 배경 */
+		    pointer-events: none; /* 직접 클릭 불가 */
+		}
+		
+		.quantity-control button {
+		    width: 30px;
+		    height: 30px;
+		    border: none;
+		    background-color: whihte; /* 버튼 색상 */
+		    color: black;
+		    border-radius: 50%; /* 둥근 버튼 */
+		    cursor: pointer;
+		    font-size: 18px;
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		}
+		
+		.quantity-control button:hover {
+		    background-color: #c0392b; /* 호버 효과 */
+		}
     </style>
 </head>
 <body>
@@ -73,7 +110,7 @@
             </thead>
             <tbody>
                 <!-- 장바구니 항목 반복 출력 -->
-                <tr th:each="cartItem : ${cartItems}">
+                <tr th:each="cartItem : ${cartItems}" th:attr="data-menu-name=${cartItem.menuName}">
                 	<td>
 	                	<span style="display: flex; align-items: center;">
 				            <img th:src="@{|/images/${cartItem.menuNameen}.jpg|}" 
@@ -83,11 +120,19 @@
 				        </span>
                 	</td>
                    	<td>
-	                    <button class="decrease-btn">-</button>
-				        <input type="number" class="item-count" th:value="${cartItem.count}" min="1">
-				        <button class="increase-btn">+</button>
-                    </td>
-                    <td th:text="${cartItem.price}">가격</td>
+				        <div class="quantity-control">
+				            <button class="decrease-btn">-</button>
+				            <input 
+				                type="number" 
+				                class="item-count" 
+				                th:value="${cartItem.count}"
+				                style="font-size: 25px"
+				                readonly
+				            >
+				            <button class="increase-btn">+</button>
+				        </div>
+				    </td>
+                    <td th:text="${cartItem.price}+ '원'">가격</td>
                 </tr>
             </tbody>
         </table>
@@ -95,7 +140,7 @@
         <!-- 전체 총합 -->
 		<div style="margin-top: 20px;">
 	        <p style="font-size: 18px; font-weight: bold; font-size: 25px;">
-	            결제 총 금액: <span th:text="${totalPrice}">0</span>원
+	            결제 총 금액: <span id="total-sum" th:text="${totalPrice}">0</span>원
 	        </p>
 	    </div>
     </div>
@@ -118,7 +163,7 @@
 	        document.querySelectorAll('.increase-btn').forEach(button => {
 	            button.addEventListener('click', function () {
 	                const row = this.closest('tr');
-	                const itemId = row.getAttribute('data-id');
+	                const itemId = row.getAttribute('data-menu-name');
 	                const countInput = row.querySelector('.item-count');
 	                const newCount = parseInt(countInput.value) + 1;
 	
@@ -130,7 +175,7 @@
 	        document.querySelectorAll('.decrease-btn').forEach(button => {
 	            button.addEventListener('click', function () {
 	                const row = this.closest('tr');
-	                const itemId = row.getAttribute('data-id');
+	                const itemId = row.getAttribute('data-menu-name');
 	                const countInput = row.querySelector('.item-count');
 	                const newCount = Math.max(parseInt(countInput.value) - 1, 1);
 	
@@ -140,7 +185,7 @@
 	
 	        // AJAX로 수량 업데이트
 	        function updateItemCount(itemId, newCount, countInput) {
-	            fetch('/cart/update', {
+	            fetch('/menu/cart/update', {
 	                method: 'POST',
 	                headers: { 'Content-Type': 'application/json' },
 	                body: JSON.stringify({ id: itemId, count: newCount })
@@ -148,18 +193,21 @@
 	            .then(response => response.json())
 	            .then(data => {
 	                if (data.success) {
+	                    // 새로운 수량 및 가격 업데이트
 	                    countInput.value = newCount;
 	                    const totalCell = countInput.closest('tr').querySelector('td:nth-last-child(1)');
-	                    totalCell.textContent = data.updatedPrice;
+	                    totalCell.textContent = data.updatedPrice + ' 원';
+	
+	                    // 전체 합계 업데이트
 	                    updateTotalSum(data.totalSum);
 	                } else {
 	                    alert('수량 업데이트에 실패했습니다.');
 	                }
 	            })
-	            .catch(err => console.error(err));
+	            .catch(err => console.error('Error:', err));
 	        }
-	
-	        // 총합 금액 업데이트
+			
+	        //전체 정보 업데이트
 	        function updateTotalSum(newTotalSum) {
 	            document.getElementById('total-sum').textContent = newTotalSum + ' 원';
 	        }
