@@ -100,12 +100,12 @@
     <h1 class="main_text">장바구니</h1>
     
     <div th:if="${cartItems.size() > 0}" class="center_table" style="display: flex; flex-direction: column; align-items: center;">
-        <table>
+        <table style="table-layout: fixed; width: 100%; border-collapse: collapse;">
             <thead>
-                <tr>
-                    <th>메뉴 이름</th>
-                    <th>수량</th>
-                    <th>가격</th>
+                <tr style="background-color: #f2f2f2;">
+                    <td style="width: 50%;">메뉴 이름</td>
+			        <td style="width: 25%;">수량</td>
+			        <td style="width: 25%;">가격</td>
                 </tr>
             </thead>
             <tbody>
@@ -116,7 +116,7 @@
 				            <img th:src="@{|/images/${cartItem.menuNameen}.jpg|}" 
 				                 th:alt="${cartItem.menuNameen}" 
 				                 style="width:100px; height:100px; margin-right: 10px;">
-				            <span th:text="${cartItem.menuName}" style="margin: 10 auto;">메뉴 이름</span>
+				            <span th:text="${cartItem.menuName}" style="margin-left: 35px; font-size: 25px; font-weight: 1000;">메뉴 이름</span>
 				        </span>
                 	</td>
                    	<td>
@@ -132,7 +132,7 @@
 				            <button class="increase-btn">+</button>
 				        </div>
 				    </td>
-                    <td th:text="${cartItem.price}+ '원'">가격</td>
+                    <td th:text="${cartItem.price * cartItem.count}+ '원'" style="font-weight: 1000; font-size: 20px;">가격</td>
                 </tr>
             </tbody>
         </table>
@@ -177,7 +177,7 @@
 	                const row = this.closest('tr');
 	                const itemId = row.getAttribute('data-menu-name');
 	                const countInput = row.querySelector('.item-count');
-	                const newCount = Math.max(parseInt(countInput.value) - 1, 1);
+	                const newCount = Math.max(parseInt(countInput.value) - 1, 0);
 	
 	                updateItemCount(itemId, newCount, countInput);
 	            });
@@ -196,7 +196,7 @@
 	                    // 새로운 수량 및 가격 업데이트
 	                    countInput.value = newCount;
 	                    const totalCell = countInput.closest('tr').querySelector('td:nth-last-child(1)');
-	                    totalCell.textContent = data.updatedPrice + ' 원';
+	                    totalCell.textContent = data.updatedPrice + '원';
 	
 	                    // 전체 합계 업데이트
 	                    updateTotalSum(data.totalSum);
@@ -209,7 +209,7 @@
 			
 	        //전체 정보 업데이트
 	        function updateTotalSum(newTotalSum) {
-	            document.getElementById('total-sum').textContent = newTotalSum + ' 원';
+	            document.getElementById('total-sum').textContent = newTotalSum;
 	        }
 	    });
     </script>

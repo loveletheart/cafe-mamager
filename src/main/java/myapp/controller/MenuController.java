@@ -80,11 +80,7 @@ public class MenuController {
     public ModelAndView showCart() {
         List<Cart> cartItems = menuService.getAllCartItems();
         ModelAndView mav = new ModelAndView("cart");
-        int totalPrice = cartItems.stream()
-                .mapToInt(item -> item.getCount() * item.getPrice())
-                .sum();//총합 계산
         mav.addObject("cartItems", cartItems);
-        mav.addObject("totalPrice", totalPrice);
         return mav;
     }
     
