@@ -15,7 +15,6 @@ import java.util.*;
 @RequestMapping("/menu")
 @RestController
 public class MenuController {
-	//menu폴더에 넣었는데 주소 설정이 이상함
     @Autowired
     private MenuService menuService;
 
