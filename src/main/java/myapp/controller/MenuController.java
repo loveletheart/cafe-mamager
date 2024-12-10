@@ -5,19 +5,17 @@ import myapp.service.MenuService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import java.util.*;
 
 @Controller
-@RestController
 @RequestMapping("/menu")
+@RestController
 public class MenuController {
-
+	//menu폴더에 넣었는데 주소 설정이 이상함
     @Autowired
     private MenuService menuService;
 
@@ -26,7 +24,7 @@ public class MenuController {
     	return getMenu("coffee",page);
     }
 
-    @GetMapping("/coffee")
+    @GetMapping("coffee")
     public ModelAndView getCoffee(@RequestParam(defaultValue = "0") int page) {
         return getMenu("coffee",page);
     }
@@ -55,7 +53,8 @@ public class MenuController {
     	
     	int pageSize = 12; // Number of items per page
         Page<Menu> menuPage = menuService.getMenuByCategory(category, page,pageSize);//데이터베이스에 메뉴의 개수 확인 및 가져오기
-        ModelAndView modelAndView = new ModelAndView(category);
+        String viewName = "menu/" + category; // 뷰 이름 수정: "menu/coffee", "menu/aid" 등
+        ModelAndView modelAndView = new ModelAndView(viewName); // 변경된 경로 적용
         modelAndView.addObject("menus", menuPage.getContent());//menus에 맞는 데이터 저장
         modelAndView.addObject("activeCategory", category);//카테고리에 맞는 버튼 색상 뒷배경과 통일
         modelAndView.addObject("totalPages", menuPage.getTotalPages()); // 전체페이지 수
@@ -84,6 +83,8 @@ public class MenuController {
         return mav;
     }
     
+    
+    //장바구니의 수량을 조절했을때 바로 반영하도록 설정
     @PostMapping("/cart/update")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> updateCartItem(@RequestBody Map<String, Object> request) {
