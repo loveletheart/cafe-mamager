@@ -13,90 +13,95 @@ import java.util.*;
 
 @Controller
 @RequestMapping("/menu")
-@RestController
 public class MenuController {
+
     @Autowired
     private MenuService menuService;
 
+    /**
+     * 기본 메뉴 페이지 (GET 요청)
+     * 사용자가 `/menu`로 접근하면 기본적으로 'coffee' 카테고리를 보여줌
+     */
     @GetMapping
-    public ModelAndView getMenu(@RequestParam(defaultValue = "0") int page) {
-    	return getMenu("coffee",page);
+    public ModelAndView showDefaultMenu(@RequestParam(defaultValue = "0") int page) {
+        return getMenu("coffee", page);  // 기본적으로 커피 카테고리를 보여줌
     }
 
-    @GetMapping("coffee")
-    public ModelAndView getCoffee(@RequestParam(defaultValue = "0") int page) {
-        return getMenu("coffee",page);
+    /**
+     * 특정 카테고리 메뉴 페이지 (GET 요청)
+     * 사용자가 `/menu/{category}`로 접근하면 해당 카테고리의 메뉴를 조회함
+     * 예: `/menu/aid`, `/menu/cookie`
+     */
+    @GetMapping("/{category}")
+    public ModelAndView getMenuByCategory(@PathVariable String category, @RequestParam(defaultValue = "0") int page) {
+        return getMenu(category, page);  // 해당 카테고리의 메뉴를 조회
     }
-    
-    @GetMapping("/aid")
-    public ModelAndView getAid(@RequestParam(defaultValue = "0") int page) {
-        return getMenu("aid",page);
-    }
-    
-    @GetMapping("/cookie")
-    public ModelAndView getCookie(@RequestParam(defaultValue = "0") int page) {
-        return getMenu("cookie",page);
-    }
-    
-    @GetMapping("/bread")
-    public ModelAndView getBread(@RequestParam(defaultValue = "0") int page) {
-        return getMenu("bread",page);
-    }
-    
-    @GetMapping("/cake")
-    public ModelAndView getCake(@RequestParam(defaultValue = "0") int page) {
-        return getMenu("cake",page);
-    }
-    
-    private ModelAndView getMenu(String category,@RequestParam(defaultValue = "0") int page) {
-    	
-    	int pageSize = 12; // Number of items per page
-        Page<Menu> menuPage = menuService.getMenuByCategory(category, page,pageSize);//데이터베이스에 메뉴의 개수 확인 및 가져오기
-        String viewName = "menu/" + category; // 뷰 이름 수정: "menu/coffee", "menu/aid" 등
-        ModelAndView modelAndView = new ModelAndView(viewName); // 변경된 경로 적용
-        modelAndView.addObject("menus", menuPage.getContent());//menus에 맞는 데이터 저장
-        modelAndView.addObject("activeCategory", category);//카테고리에 맞는 버튼 색상 뒷배경과 통일
-        modelAndView.addObject("totalPages", menuPage.getTotalPages()); // 전체페이지 수
-        modelAndView.addObject("currentPage", page); // 현재 페이지
-        System.out.println("Menus on current page: " + menuPage.getContent().size());
+
+    /**
+     * 내부 메서드 - 메뉴 데이터 조회 및 페이지 반환
+     * 카테고리에 따라 데이터를 가져와서 ModelAndView를 구성하여 반환
+     */
+    private ModelAndView getMenu(String category, int page) {
+        int pageSize = 12;  // 한 페이지당 12개의 아이템을 표시
+        Page<Menu> menuPage = menuService.getMenuByCategory(category, page, pageSize);
+
+        String viewName = "menu/" + category; // 뷰 이름 지정 (ex: menu/coffee, menu/aid)
+        ModelAndView modelAndView = new ModelAndView(viewName);
+
+        modelAndView.addObject("menus", menuPage.getContent());  // 메뉴 데이터 추가
+        modelAndView.addObject("activeCategory", category);  // 현재 카테고리 지정 (버튼 활성화용)
+        modelAndView.addObject("totalPages", menuPage.getTotalPages());  // 전체 페이지 수 추가
+        modelAndView.addObject("currentPage", page);  // 현재 페이지 번호 추가
+
+        System.out.println("Menus on current page: " + menuPage.getContent().size()); // 디버깅용 출력
+
         return modelAndView;
     }
-    
-    @PostMapping("/add")//장바구니 버튼 클릭시 실행
+
+    /**
+     * 장바구니 추가 (AJAX 요청 처리)
+     * 사용자가 '장바구니 추가' 버튼을 클릭하면 호출됨
+     */
+    @PostMapping("/add")
     public ResponseEntity<String> addToCart(@RequestBody Cart cart) {
-        boolean result = menuService.addToCart(cart.getMenuName());
-        
+        boolean result = menuService.addToCart(cart.getMenuName());  // 장바구니 추가 로직 실행
+
         if (result) {
             return ResponseEntity.ok("상품이 장바구니에 추가되었습니다.");
         } else {
             return ResponseEntity.status(500).body("장바구니 추가에 실패했습니다.");
         }
     }
-    
-    // 장바구니 페이지로 이동
+
+    /**
+     * 장바구니 페이지 이동 (GET 요청)
+     * 사용자가 `/menu/cart`로 접근하면 장바구니 페이지를 보여줌
+     */
     @GetMapping("/cart")
     public ModelAndView showCart() {
-        List<Cart> cartItems = menuService.getAllCartItems();
-        ModelAndView mav = new ModelAndView("cart");
-        mav.addObject("cartItems", cartItems);
+        List<Cart> cartItems = menuService.getAllCartItems();  // 장바구니 데이터 가져오기
+        ModelAndView mav = new ModelAndView("cart");  // 뷰 이름: cart.html
+        mav.addObject("cartItems", cartItems);  // 장바구니 데이터 추가
         return mav;
     }
-    
-    
-    //장바구니의 수량을 조절했을때 바로 반영하도록 설정
+
+    /**
+     * 장바구니 수량 업데이트 (AJAX 요청 처리)
+     * 사용자가 장바구니에서 수량을 변경하면 서버에서 업데이트 후 총 가격을 반환
+     */
     @PostMapping("/cart/update")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> updateCartItem(@RequestBody Map<String, Object> request) {
-        String id = (String) request.get("id");
-        int count = (int) request.get("count");
+        String id = (String) request.get("id");  // 장바구니 아이템 ID 가져오기
+        int count = (int) request.get("count");  // 변경된 수량 가져오기
 
-        // 수량 업데이트 및 가격 계산
-        boolean success = menuService.updateItemCount(id, count);
+        boolean success = menuService.updateItemCount(id, count);  // 수량 업데이트
         Map<String, Object> response = new HashMap<>();
 
         if (success) {
-            int updatedPrice = menuService.calculateItemPrice(id);
-            int totalSum = menuService.calculateTotalSum();
+            int updatedPrice = menuService.calculateItemPrice(id);  // 변경된 상품 가격 계산
+            int totalSum = menuService.calculateTotalSum();  // 총 금액 계산
+
             response.put("success", true);
             response.put("updatedPrice", updatedPrice);
             response.put("totalSum", totalSum);
