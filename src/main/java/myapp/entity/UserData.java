@@ -2,8 +2,10 @@ package myapp.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "userdata")
 public class UserData {
 	@Id
     private String id;
@@ -11,8 +13,16 @@ public class UserData {
     private String password;
 
     // Getter 및 Setter
+    
+    public UserData() {
+    }
 
-    public String getId() {
+    public UserData(String id, String password) {
+        this.id = id;
+        this.password = password;
+    }
+
+	public String getId() {
         return id;
     }
 

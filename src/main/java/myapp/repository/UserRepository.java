@@ -1,9 +1,9 @@
 package myapp.repository;
 
+import myapp.entity.UserData;
 import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Optional;
 
-import myapp.entity.User;
-
-public interface UserRepository extends JpaRepository<User, Long> {
-    User findByUsername(String username);
+public interface UserRepository extends JpaRepository<UserData, String> {
+    Optional<UserData> findById(String id);
 }
