@@ -15,11 +15,17 @@ public class loginController {
     }
 
     @GetMapping("/login")
-    public String showLoginPage(@RequestParam(value = "error", required = false) String error, Model model) {
+    public String showLoginPage(
+            @RequestParam(value = "error", required = false) String error,
+            @RequestParam(value = "logout", required = false) String logout,
+            Model model) {
         if (error != null) {
             model.addAttribute("loginError", "아이디 또는 비밀번호가 올바르지 않습니다.");
         }
-        return "login";
+        if (logout != null) {
+            model.addAttribute("logoutMessage", "로그아웃 되었습니다.");
+        }
+        return "/login";
     }
 
     /**

@@ -12,29 +12,29 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
     
-    @Bean
+	@Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) // 필요하면 CSRF 비활성화
+            .csrf(csrf -> csrf.disable()) // 테스트용으로 CSRF 비활성화, 실제 서비스에서는 주의 필요
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/login", "/css/**", "/js/**").permitAll() // 로그인 페이지 및 정적 파일 접근 허용
-                .requestMatchers("/menu/**").authenticated() // 로그인 후 메뉴 페이지 접근 가능
+                .requestMatchers("/login", "/register", "/css/**", "/js/**").permitAll()  // /register를 포함하여 접근 허용
+                .anyRequest().authenticated()
             )
             .formLogin(form -> form
-                    .loginPage("/login")
-                    .loginProcessingUrl("/login")
-                    .usernameParameter("id")
-                    .defaultSuccessUrl("/menu", true)
-                    .failureUrl("/login?error=true")
-                    .permitAll()
+                .loginPage("/login")
+                .loginProcessingUrl("/login")
+                .usernameParameter("id")  // 기본 "username" 대신 "id"를 사용하도록 설정
+                .defaultSuccessUrl("/menu", true)
+                .failureUrl("/login?error=true")
+                .permitAll()
             )
             .logout(logout -> logout
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/login")
+                .logoutSuccessUrl("/login?logout=true")
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID")
+                .permitAll()
             );
-
         return http.build();
     }
 
