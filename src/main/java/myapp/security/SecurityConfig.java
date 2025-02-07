@@ -21,11 +21,12 @@ public class SecurityConfig {
                 .requestMatchers("/menu/**").authenticated() // 로그인 후 메뉴 페이지 접근 가능
             )
             .formLogin(form -> form
-                .loginPage("/login") // 로그인 페이지 지정
-                .loginProcessingUrl("/login") // 로그인 폼 action URL
-                .defaultSuccessUrl("/menu", true) // 로그인 성공 시 이동할 페이지
-                .failureUrl("/login?error=true") // 로그인 실패 시 이동할 페이지
-                .permitAll()
+                    .loginPage("/login")
+                    .loginProcessingUrl("/login")
+                    .usernameParameter("id")
+                    .defaultSuccessUrl("/menu", true)
+                    .failureUrl("/login?error=true")
+                    .permitAll()
             )
             .logout(logout -> logout
                 .logoutUrl("/logout")
