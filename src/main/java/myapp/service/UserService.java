@@ -43,13 +43,13 @@ public class UserService implements UserDetailsService {
     }
 
     // 회원가입: 입력된 id와 rawPassword를 받아서 저장 (비밀번호 암호화)
-    public boolean registerUser(String id, String rawPassword) {
+    public boolean registerUser(String id, String rawPassword, String username, String role) {
         if (userRepository.findById(id).isPresent()) {
-            System.out.println("이미 존재하는 ID: " + id);
+            System.out.println("이미 존재하는 id 또는 username: " + id + ", " + username);
             return false;
         }
         String encodedPassword = passwordEncoder.encode(rawPassword);
-        UserData newUser = new UserData(id, encodedPassword);
+        UserData newUser = new UserData(id, username, encodedPassword, role);
         userRepository.save(newUser);
         System.out.println("회원가입 성공: " + id);
         return true;

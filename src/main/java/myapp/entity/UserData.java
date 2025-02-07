@@ -11,15 +11,18 @@ public class UserData {
     private String id;
     private String username;
     private String password;
+    private String Role;
 
     // Getter 및 Setter
     
     public UserData() {
     }
 
-    public UserData(String id, String password) {
+    public UserData(String id,String username,String password,String role) {
         this.id = id;
+        this.username = username;
         this.password = password;
+        this.Role= role;
     }
 
 	public String getId() {
@@ -44,5 +47,12 @@ public class UserData {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+    public String getRole() {
+        return Role;
+    }
+
+    public void setRole(String Role) {
+        this.Role = Role;
     }
 }

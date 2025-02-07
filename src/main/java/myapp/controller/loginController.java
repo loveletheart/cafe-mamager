@@ -45,14 +45,17 @@ public class loginController {
     public String processRegistration(
             @RequestParam String id,
             @RequestParam String password,
+            @RequestParam String username,
+            @RequestParam String role,
             Model model) {
 
-        boolean success = userService.registerUser(id, password);
+        // 인자 순서를 (id, username, password, role)로 변경
+        boolean success = userService.registerUser(id, username, password, role);
 
         if (!success) {
             // 회원가입 실패 시 오류 메시지 모델에 추가하고 회원가입 페이지를 다시 보여줍니다.
-            model.addAttribute("errorMessage", "이미 존재하는 ID입니다.");
-            return "/register";
+            model.addAttribute("errorMessage", "이미 존재하는 ID 또는 Username입니다.");
+            return "login/register";
         }
         // 회원가입 성공 시 로그인 페이지로 리디렉션
         return "redirect:/login";
