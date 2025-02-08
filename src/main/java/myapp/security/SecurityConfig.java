@@ -23,6 +23,7 @@ public class SecurityConfig {
             .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/login")
+                .successHandler(new CustomAuthenticationSuccessHandler()) // 커스텀 성공 핸들러 적용
                 .usernameParameter("id")  // 기본 "username" 대신 "id"를 사용하도록 설정
                 .defaultSuccessUrl("/menu", true)
                 .failureUrl("/login?error=true")

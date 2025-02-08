@@ -6,11 +6,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-public class loginController {
+public class LoginController {
 
     private final UserService userService;
 
-    public loginController(UserService userService) {
+    public LoginController(UserService userService) {
         this.userService = userService;
     }
 
@@ -50,7 +50,7 @@ public class loginController {
             Model model) {
 
         // 인자 순서를 (id, username, password, role)로 변경
-        boolean success = userService.registerUser(id, username, password, role);
+        boolean success = userService.registerUser(id, password, role, username);
 
         if (!success) {
             // 회원가입 실패 시 오류 메시지 모델에 추가하고 회원가입 페이지를 다시 보여줍니다.

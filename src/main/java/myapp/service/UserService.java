@@ -43,7 +43,7 @@ public class UserService implements UserDetailsService {
     }
 
     // 회원가입: 입력된 id와 rawPassword를 받아서 저장 (비밀번호 암호화)
-    public boolean registerUser(String id, String rawPassword, String username, String role) {
+    public boolean registerUser(String id, String rawPassword, String role, String username) {
         if (userRepository.findById(id).isPresent()) {
             System.out.println("이미 존재하는 id 또는 username: " + id + ", " + username);
             return false;
