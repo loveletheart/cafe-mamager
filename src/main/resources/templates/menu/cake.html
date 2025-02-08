@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Menu</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery가 반드시 먼저 로드되어야 함 -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -59,6 +60,26 @@
             border-radius: 10px;
             background-color: #f9f9f9;
         }
+        .pagination li {
+		    display: inline-block;
+		    margin-right: 10px; /* Adjust the spacing as needed */
+		}
+		.pagination li a {
+			text-decoration:none;
+			font-size: 40px;
+		}
+		.cart-button {
+		    display: inline-block;         /* 버튼처럼 보이게 설정 */
+		    padding: 12px 24px;            /* 버튼 내부 여백 */
+		    font-size: 50px;               /* 글자 크기 */
+		    color: white;                  /* 글자 색상 */
+		    background-color: #ff6666;     /* 버튼 배경색 (붉은색 계열) */
+		    border: none;                  /* 테두리 제거 */
+		    border-radius: 20px;           /* 모서리 둥글게 */
+		    text-decoration: none;         /* 링크 밑줄 제거 */
+		    cursor: pointer;               /* 커서를 포인터로 변경 */
+		    transition: background-color 0.3s ease; /* 호버 시 배경색 전환 효과 */
+		}
     </style>
 </head>
 <body>
@@ -74,14 +95,69 @@
     
     <div class="menu-grid">
         <div class="menu-item" th:each="menu : ${menus}">
-        	<img th:src="@{|/images/${menu.menuNameen}.jpg|}" th:alt="${menu.menuNameen}" style="width:300px;height:auto;"><!-- 표현식 처리를 해결하기 위해 리터널 블록 사용 -->
+        	<img th:src="@{|./../images/${menu.menuNameen}.jpg|}" th:alt="${menu.menuNameen}" style="width:300px;height:auto;"><!-- 표현식 처리를 해결하기 위해 리터널 블록 사용 -->
             <p>Menu Name: <span th:text="${menu.menuName}">Menu Name</span></p>
             <p>Menu Price: <span th:text="${menu.price}">Menu Price</span></p>
+            <button th:data-menuName='${menu.menuName}'>장바구니에 담기</button>
         </div>
+    </div>
+    
+    <div th:if="${totalPages > 1}">
+        <nav>
+           <div class="pagination">
+			    <ul>
+			        <!-- Previous Page Link -->
+			        <li th:if="${currentPage > 0}">
+						<a th:href="@{|/menu/${activeCategory}?page=${currentPage - 1}|}" >＜</a>
+			        </li>
+			
+			        <!-- Page Number Links -->
+			        <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+			            <a th:href="@{|/menu/${activeCategory}?page=${i}|}" th:text="${i + 1}" th:classappend="${i == currentPage} ? ' active'"></a>
+			        </li>
+			
+			        <!-- Next Page Link -->
+			        <li th:if="${currentPage < totalPages - 1}">
+			            <a th:href="@{|/menu/${activeCategory}?page=${currentPage + 1}|}">＞</a>
+			        </li>
+			    </ul>
+			</div>
+		</nav>
     </div>
     
     <div th:if="${menus.isEmpty()}">
         <p>No menu items found</p>
     </div>
+    
+    <!-- cart(장바구니)페이지로 이동하는 버튼 -->
+    <div style="margin-top: 20px; text-align: center;">
+        <a href="menu/cart" class="cart-button">장바구니</a>
+    </div>
+    
+    <script>
+		$(document).ready(function() {
+	        // addToCart 함수 정의
+	        window.addToCart = function(menuName) {
+	            $.ajax({
+	                type: 'POST',
+	                url: '/menu/add',
+	                data: JSON.stringify({ menuName: menuName }),
+	                contentType: 'application/json',
+	                success: function(response) {
+	                    alert("상품이 장바구니에 추가되었습니다.");
+	                },
+	                error: function(xhr, status, error) {
+	                    alert("장바구니 추가에 실패했습니다.");
+	                }
+	            });
+	        };
+	
+		// 버튼 클릭 이벤트 바인딩 (onclick을 대체)
+		$('button').click(function() {
+			const menuName = $(this).attr('data-menuName');  // 버튼의 data 속성에서 menuName 가져오기
+		    addToCart(menuName);
+		    });
+		});
+    </script>
 </body>
 </html>

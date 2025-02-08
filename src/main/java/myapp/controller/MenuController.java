@@ -24,7 +24,8 @@ public class MenuController {
      */
     @GetMapping
     public ModelAndView showDefaultMenu(@RequestParam(defaultValue = "0") int page) {
-        return getMenu("coffee", page);  // 기본적으로 커피 카테고리를 보여줌
+    	 // 리다이렉트 URL에 페이지 파라미터 포함
+        return new ModelAndView("redirect:/menu/coffee?page=" + page);
     }
 
     /**
