@@ -91,9 +91,6 @@
 
         div.appendChild(button);
         container.appendChild(div);
-
-        // 경과 시간 업데이트
-        updateElapsedTime();
     }
 
     // 주문 화면 생성
@@ -105,22 +102,20 @@
     function updateElapsedTime() {
         for (var i = 0; i < container.children.length; i++) {
             (function (index) {
+                var timerElement = container.querySelectorAll(".timer")[index];
+                var screenElement = container.querySelectorAll(".screen")[index];
+
                 setInterval(function () {
                     var currentTime = new Date();
                     var elapsedTime = Math.floor((currentTime - orderTimes[index]) / 1000);
-                    var timerElement = container.querySelectorAll(".timer")[index];
                     timerElement.textContent = formatTime(elapsedTime);
 
                     // 경과 시간에 따라 내부 스크린 색상 변경
-                    var screenElement = container.querySelectorAll(".screen")[index];
                     if (elapsedTime >= 600) {
-                        // 10분 이상 경과 시 빨간색 배경색으로 변경 (투명도 50%)
                         screenElement.style.backgroundColor = "rgba(255, 0, 0, 0.5)";
                     } else if (elapsedTime >= 300) {
-                        // 5분 이상 경과 시 주황색 배경색으로 변경 (투명도 50%)
                         screenElement.style.backgroundColor = "rgba(255, 165, 0, 0.5)";
                     } else {
-                        // 그 외의 경우에는 초기 배경색(흰색)으로 변경
                         screenElement.style.backgroundColor = "white";
                     }
                 }, 1000);

@@ -3,24 +3,33 @@ package myapp.security;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import myapp.entity.UserData;
+
 import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 
-public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
+@Component
+public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
-        // 인증 성공 시, 인증된 사용자 이름 가져오기
-        String username = authentication.getName();
-        
-        // 사용자 아이디가 "master"라면 ods/ODS 페이지로 이동
-        if ("master".equals(username)) {
-            response.sendRedirect(request.getContextPath() + "/ods/ODS");
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof UserData user) {  // UserData로 변환 가능
+            if ("master".equals(user.getId())) {  // ID 기반 비교
+                setDefaultTargetUrl("/ods/ODS");
+            } else {
+                setDefaultTargetUrl("/menu");
+            }
         } else {
-            // 그 외의 경우 기본 성공 URL로 이동 (예: /menu)
-            response.sendRedirect(request.getContextPath() + "/menu");
+            setDefaultTargetUrl("/menu");
+            System.out.println("UserData가 아님, 기본 /menu로 이동");
         }
+
+        super.onAuthenticationSuccess(request, response, authentication);
     }
 }

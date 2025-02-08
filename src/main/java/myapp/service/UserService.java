@@ -9,6 +9,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
@@ -25,21 +27,10 @@ public class UserService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
+        UserData user = userRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + id));
 
-        Optional<UserData> userOptional = userRepository.findById(id);
-        if (!userOptional.isPresent()) {
-            throw new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + id);
-        }
-        UserData user = userOptional.get();
-
-        System.out.println("DB에서 조회된 사용자: " + user.getId());
-        System.out.println("DB에 저장된 암호화된 비밀번호: " + user.getPassword());
-
-        return User.builder()
-                   .username(user.getId())
-                   .password(user.getPassword())
-                   .roles("USER")
-                   .build();
+        return user;  // ✅ UserData 자체를 반환!
     }
 
     // 회원가입: 입력된 id와 rawPassword를 받아서 저장 (비밀번호 암호화)
@@ -54,4 +45,6 @@ public class UserService implements UserDetailsService {
         System.out.println("회원가입 성공: " + id);
         return true;
     }
+    
+    
 }

@@ -21,14 +21,14 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
-                .loginPage("/login")
-                .loginProcessingUrl("/login")
-                .successHandler(new CustomAuthenticationSuccessHandler()) // 커스텀 성공 핸들러 적용
-                .usernameParameter("id")  // 기본 "username" 대신 "id"를 사용하도록 설정
-                .defaultSuccessUrl("/menu", true)
-                .failureUrl("/login?error=true")
-                .permitAll()
-            )
+                    .loginPage("/login")  // 커스텀 로그인 페이지
+                    .loginProcessingUrl("/login")  // 로그인 처리 URL
+                    .usernameParameter("id")  // 기본 "username" 대신 "id" 사용
+                    .passwordParameter("password")  // 패스워드 필드 명시
+                    .successHandler(new CustomAuthenticationSuccessHandler()) // 커스텀 성공 핸들러 적용
+                    .failureUrl("/login?error=true")  // 로그인 실패 시 이동
+                    .permitAll()
+                )
             .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?logout=true")
