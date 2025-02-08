@@ -80,7 +80,7 @@ public class MenuController {
     @GetMapping("/cart")
     public ModelAndView showCart() {
         List<Cart> cartItems = menuService.getAllCartItems();  // 장바구니 데이터 가져오기
-        ModelAndView mav = new ModelAndView("cart");  // 뷰 이름: cart.html
+        ModelAndView mav = new ModelAndView("menu/cart");  // 뷰 이름: cart.html
         mav.addObject("cartItems", cartItems);  // 장바구니 데이터 추가
         return mav;
     }
