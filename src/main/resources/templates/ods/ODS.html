@@ -1,141 +1,144 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>주문 화면</title>
-    <style>
-        .screen {
-            width: 300px;
-            height: 300px;
-            border: 1px solid #ccc;
-            margin: 10px;
-            float: left;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            transition: box-shadow 0.3s ease-in-out;
-            border-radius: 10px;
-            position: relative;
-        }
-        .screen h2,
-        .screen p {
-            margin-left: 10px;
-        }
-        .screen hr {
-            border: none;
-            height: 2px;
-            background-color: black;
-        }
-        .screen:hover {
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        .button {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            margin: 10px;
-            padding: 5px 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .timer {
-            float: right;
-            margin-right: 10px;
-            margin-top: 10px;
-            font-size: 17px;
-            font-weight: normal;
-            font-family: Arial, sans-serif;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>주문 화면</title>
+  <style>
+    .screen {
+      width: 300px;
+      height: 300px;
+      border: 1px solid #ccc;
+      margin: 10px;
+      float: left;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      transition: box-shadow 0.3s ease-in-out;
+      border-radius: 10px;
+      position: relative;
+      background-color: white;
+    }
+    .screen h2,
+    .screen p {
+      margin-left: 10px;
+    }
+    .screen hr {
+      border: none;
+      height: 2px;
+      background-color: black;
+    }
+    .screen:hover {
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    .button {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      margin: 10px;
+      padding: 5px 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .timer {
+      float: right;
+      margin-right: 10px;
+      margin-top: 10px;
+      font-size: 17px;
+      font-weight: normal;
+      font-family: Arial, sans-serif;
+    }
+  </style>
 </head>
 <body>
-<div id="container"></div>
-<script>
+  <div id="container"></div>
+  <script>
     var container = document.getElementById("container");
     var orderTimes = [];
 
-    // 주문 화면 생성
+    // 주문 화면 생성 함수
     function createOrderScreen(index) {
-        var div = document.createElement("div");
-        div.className = "screen";
-        div.innerHTML = "<h2>주문" + (index + 1) + " <span class='timer'></span></h2>";
-        var hr = document.createElement("hr");
-        div.appendChild(hr);
+      var div = document.createElement("div");
+      div.className = "screen";
+      // 타이머 초기값 00:00:00을 함께 표시
+      div.innerHTML = "<h2>주문 " + (index + 1) + " <span class='timer'>00:00:00</span></h2>";
+      
+      var hr = document.createElement("hr");
+      div.appendChild(hr);
 
-        // 추가 콘텐츠 생성
-        for (var j = 0; j < 2; j++) {
-            var additionalContent = document.createElement("p");
-            additionalContent.innerHTML = "테스트" + j;
-            div.appendChild(additionalContent);
+      // 추가 콘텐츠 생성
+      for (var j = 0; j < 2; j++) {
+        var additionalContent = document.createElement("p");
+        additionalContent.innerHTML = "테스트 " + j;
+        div.appendChild(additionalContent);
+      }
+
+      // 주문 시간 기록 (생성 시점의 시간을 저장)
+      var orderTime = new Date();
+      orderTimes.splice(index, 0, orderTime);
+
+      // 버튼 생성
+      var button = document.createElement("button");
+      button.textContent = "버튼 " + (index + 1);
+      button.className = "button";
+
+      // 버튼 클릭 시 해당 주문 화면 삭제
+      button.addEventListener("click", (function (idx) {
+        return function () {
+          container.removeChild(container.childNodes[idx]);
+          orderTimes.splice(idx, 1); // 삭제된 주문의 시간 기록도 제거
         }
+      })(index));
 
-        // 주문 시간 기록
-        var orderTime = new Date();
-        orderTimes.splice(index, 0, orderTime); // 해당 인덱스에 시간 기록 삽입
-
-        // 버튼 생성
-        var button = document.createElement("button");
-        button.textContent = "버튼 " + (index + 1);
-        button.className = "button";
-
-        // 클로저를 사용하여 해당 스크린의 인덱스를 기억
-        button.addEventListener("click", (function (idx) {
-            return function () {
-                // 해당 스크린 삭제
-                container.removeChild(container.childNodes[idx]);
-                orderTimes.splice(idx, 1); // 해당 인덱스의 시간 기록 삭제
-                updateElapsedTime();
-            }
-        })(index));
-
-        div.appendChild(button);
-        container.appendChild(div);
+      div.appendChild(button);
+      container.appendChild(div);
     }
 
-    // 주문 화면 생성
+    // 예시로 5개의 주문 화면 생성
     for (var i = 0; i < 5; i++) {
-        createOrderScreen(i);
+      createOrderScreen(i);
     }
 
-    // 경과 시간 업데이트 함수
+    // 모든 주문 화면의 경과 시간을 업데이트하는 글로벌 함수
     function updateElapsedTime() {
-        for (var i = 0; i < container.children.length; i++) {
-            (function (index) {
-                var timerElement = container.querySelectorAll(".timer")[index];
-                var screenElement = container.querySelectorAll(".screen")[index];
+      // 모든 주문 화면 내 타이머 요소와 스크린 요소 가져오기
+      var timerElements = document.querySelectorAll(".timer");
+      var screenElements = document.querySelectorAll(".screen");
 
-                setInterval(function () {
-                    var currentTime = new Date();
-                    var elapsedTime = Math.floor((currentTime - orderTimes[index]) / 1000);
-                    timerElement.textContent = formatTime(elapsedTime);
+      timerElements.forEach(function(timerElement, i) {
+        // 해당 주문의 시간 기록이 있을 경우에만 업데이트
+        if (orderTimes[i]) {
+          var currentTime = new Date();
+          var elapsedTime = Math.floor((currentTime - orderTimes[i]) / 1000);
+          timerElement.textContent = formatTime(elapsedTime);
 
-                    // 경과 시간에 따라 내부 스크린 색상 변경
-                    if (elapsedTime >= 600) {
-                        screenElement.style.backgroundColor = "rgba(255, 0, 0, 0.5)";
-                    } else if (elapsedTime >= 300) {
-                        screenElement.style.backgroundColor = "rgba(255, 165, 0, 0.5)";
-                    } else {
-                        screenElement.style.backgroundColor = "white";
-                    }
-                }, 1000);
-            })(i);
+          // 경과 시간에 따라 배경색 변경
+          if (elapsedTime >= 600) {
+            screenElements[i].style.backgroundColor = "rgba(255, 0, 0, 0.5)";
+          } else if (elapsedTime >= 300) {
+            screenElements[i].style.backgroundColor = "rgba(255, 165, 0, 0.5)";
+          } else {
+            screenElements[i].style.backgroundColor = "white";
+          }
         }
+      });
     }
 
-    // 시간 형식 포맷팅 함수
+    // 1초마다 updateElapsedTime 함수를 호출하여 주문 화면 업데이트
+    setInterval(updateElapsedTime, 1000);
+
+    // 시간 형식 포맷팅 함수 (초 단위 입력을 hh:mm:ss 형태로 변환)
     function formatTime(time) {
-        var hours = Math.floor(time / 3600);
-        var minutes = Math.floor((time % 3600) / 60);
-        var seconds = time % 60;
-
-        return pad(hours) + ":" + pad(minutes) + ":" + pad(seconds);
+      var hours = Math.floor(time / 3600);
+      var minutes = Math.floor((time % 3600) / 60);
+      var seconds = time % 60;
+      return pad(hours) + ":" + pad(minutes) + ":" + pad(seconds);
     }
 
-    // 숫자 포맷팅 함수
+    // 숫자 두 자릿수 포맷팅 함수
     function pad(num) {
-        return (num < 10 ? "0" : "") + num;
+      return (num < 10 ? "0" : "") + num;
     }
-</script>
+  </script>
 </body>
 </html>
