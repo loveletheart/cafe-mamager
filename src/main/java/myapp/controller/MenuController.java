@@ -2,11 +2,18 @@ package myapp.controller;
 
 import myapp.entity.*;
 import myapp.service.MenuService;
+import myapp.repository.CartRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import java.util.*;
@@ -17,6 +24,7 @@ public class MenuController {
 
     @Autowired
     private MenuService menuService;
+    private CartRepository cartRepository;
 
     /**
      * 기본 메뉴 페이지 (GET 요청)
@@ -64,52 +72,43 @@ public class MenuController {
      * 사용자가 '장바구니 추가' 버튼을 클릭하면 호출됨
      */
     @PostMapping("/add")
-    public ResponseEntity<String> addToCart(@RequestBody Cart cart) {
-        boolean result = menuService.addToCart(cart.getMenuName());  // 장바구니 추가 로직 실행
+    public ResponseEntity<String> addToCart(@RequestBody Map<String, String> request) {
+        String menuName = request.get("menuName");
+
+        boolean result = menuService.addToCart(menuName);
 
         if (result) {
             return ResponseEntity.ok("상품이 장바구니에 추가되었습니다.");
         } else {
-            return ResponseEntity.status(500).body("장바구니 추가에 실패했습니다.");
+            return ResponseEntity.status(500).body("장바구니 추가 실패");
         }
     }
 
     /**
-     * 장바구니 페이지 이동 (GET 요청)
-     * 사용자가 `/menu/cart`로 접근하면 장바구니 페이지를 보여줌
+     * 로그인한 사용자의 장바구니 목록 조회
      */
     @GetMapping("/cart")
-    public ModelAndView showCart() {
-        List<Cart> cartItems = menuService.getAllCartItems();  // 장바구니 데이터 가져오기
-        ModelAndView mav = new ModelAndView("menu/cart");  // 뷰 이름: cart.html
-        mav.addObject("cartItems", cartItems);  // 장바구니 데이터 추가
-        return mav;
+    public String showCart(@RequestParam String userId, Model model) {
+        List<Cart> cartItems = cartRepository.findByUserId(userId);  // userId로 장바구니 아이템을 조회
+        model.addAttribute("cartItems", cartItems);
+        return "menu/cart";  // 장바구니 페이지로 리턴
     }
 
     /**
-     * 장바구니 수량 업데이트 (AJAX 요청 처리)
-     * 사용자가 장바구니에서 수량을 변경하면 서버에서 업데이트 후 총 가격을 반환
+     * ✅ 장바구니 상품 수량 업데이트
      */
     @PostMapping("/cart/update")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> updateCartItem(@RequestBody Map<String, Object> request) {
-        String id = (String) request.get("id");  // 장바구니 아이템 ID 가져오기
-        int count = (int) request.get("count");  // 변경된 수량 가져오기
+    public String updateCartItem(@RequestParam String userId, @RequestParam String menuName, @RequestParam int count) {
+        Optional<Cart> cartItemOptional = cartRepository.findById(userId + menuName);
 
-        boolean success = menuService.updateItemCount(id, count);  // 수량 업데이트
-        Map<String, Object> response = new HashMap<>();
-
-        if (success) {
-            int updatedPrice = menuService.calculateItemPrice(id);  // 변경된 상품 가격 계산
-            int totalSum = menuService.calculateTotalSum();  // 총 금액 계산
-
-            response.put("success", true);
-            response.put("updatedPrice", updatedPrice);
-            response.put("totalSum", totalSum);
+        if (cartItemOptional.isPresent()) {
+            Cart cartItem = cartItemOptional.get();
+            cartItem.setCount(count);
+            cartRepository.save(cartItem);
+            return "장바구니가 업데이트 되었습니다.";
         } else {
-            response.put("success", false);
+            return "장바구니에 해당 아이템이 없습니다.";
         }
-
-        return ResponseEntity.ok(response);
     }
 }

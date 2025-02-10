@@ -25,7 +25,7 @@ public class LoginController {
         if (logout != null) {
             model.addAttribute("logoutMessage", "로그아웃 되었습니다.");
         }
-        return "/login";
+        return "login/login"; // 템플릿: src/main/resources/templates/login/login.html
     }
 
     /**

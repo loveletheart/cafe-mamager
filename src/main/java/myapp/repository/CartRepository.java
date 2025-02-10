@@ -1,12 +1,16 @@
 package myapp.repository;
 
-
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
 import myapp.entity.Cart;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
 
-@Repository
 public interface CartRepository extends JpaRepository<Cart, String> {
-	Cart findByMenuName(String Cart);// 특정 메뉴가 이미 장바구니에 있는지 확인
+
+    // 사용자 아이디와 메뉴 이름을 기준으로 장바구니 항목을 찾는 메서드
+    List<Cart> findByUserId(String userId);
+
+    // 사용자 아이디와 메뉴 이름을 기준으로 장바구니 항목을 하나만 찾는 메서드
+    Cart findByUserIdAndMenuName(String userId, String menuName);
+
+    // 다른 필요한 메서드를 추가할 수 있음
 }

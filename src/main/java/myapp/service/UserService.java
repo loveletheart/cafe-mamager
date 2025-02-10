@@ -30,7 +30,7 @@ public class UserService implements UserDetailsService {
         UserData user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + id));
 
-        return user;  // ✅ UserData 자체를 반환!
+        return user;  // UserData 자체를 반환!
     }
 
     // 회원가입: 입력된 id와 rawPassword를 받아서 저장 (비밀번호 암호화)

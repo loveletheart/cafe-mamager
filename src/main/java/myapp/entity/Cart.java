@@ -2,63 +2,77 @@ package myapp.entity;
 
 import jakarta.persistence.*;
 
-
 @Entity
-@Table(name = "cart")
 public class Cart {
-	
-	 	@Id
-	 	@Column(name = "menu_name")
-	    private String menuName;//해당 순서에 맞추어서 데이터에서 검색함
-	 	
-	 	private String id;
-	 	
-	 	@Column(name = "menu_nameen")
-	    private String menuNameen;
-	 	
-	 	private int count;
-	 	
-	    private int price;
-	    
-	    public Cart() {}
-	    
-	    public Cart(String id,String menuName,String menuNameen,int count,int price) {  //데이터를 받아서 넣을 값을 지정
-	    	this.id = id;
-	    	this.menuName = menuName;
-	        this.menuNameen = menuNameen;
-	        this.count = count;
-	        this.price = price;
-	    }
 
-	    public String getMenuName() {
-	        return menuName;
-	    }
+    @Id
+    private String id;  // 복합키 또는 간단한 id로 사용
 
-	    public void setMenuName(String menuName) {
-	        this.menuName = menuName;
-	    }
-	    
-	    public String getMenuNameen() {
-	        return menuNameen;
-	    }
+    private String userId;
+    private String menuName;
+    private String menuNameen;
+    private int count;
+    private int price;
 
-	    public void setMenuNameen(String menuNameen) {
-	        this.menuNameen = menuNameen;
-	    }
-	    
-	    public int getCount() {
-	        return count;
-	    }
+    // 기본 생성자
+    public Cart() {}
 
-	    public void setCount(int count) {
-	        this.count = count;
-	    }
-	    
-	    public int getPrice() {
-	        return price;
-	    }
+    // 모든 필드를 포함한 생성자
+    public Cart(String id, String userId, String menuName, String menuNameen, int count, int price) {
+        this.id = id;
+        this.userId = userId;
+        this.menuName = menuName;
+        this.menuNameen = menuNameen;
+        this.count = count;
+        this.price = price;
+    }
 
-	    public void setPrice(int price) {
-	        this.price = price;
-	    }
+    // 게터 및 세터 메서드들
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getMenuName() {
+        return menuName;
+    }
+
+    public void setMenuName(String menuName) {
+        this.menuName = menuName;
+    }
+
+    public String getMenuNameen() {
+        return menuNameen;
+    }
+
+    public void setMenuNameen(String menuNameen) {
+        this.menuNameen = menuNameen;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
 }
