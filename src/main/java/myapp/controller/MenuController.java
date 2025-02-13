@@ -89,7 +89,7 @@ public class MenuController {
      */
     @GetMapping("/cart")
     public String showCart(@RequestParam String userId, Model model) {
-        List<Cart> cartItems = cartRepository.findByUserId(userId);  // userId로 장바구니 아이템을 조회
+    	Optional<Cart> cartItems = cartRepository.findById(userId);  // userId로 장바구니 아이템을 조회
         model.addAttribute("cartItems", cartItems);
         return "menu/cart";  // 장바구니 페이지로 리턴
     }

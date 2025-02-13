@@ -39,14 +39,14 @@ public class MenuService {
         String id = authentication.getName(); // 현재 로그인한 사용자의 ID (username)
 
         // 해당 메뉴와 사용자 아이디로 장바구니 항목 찾기
-        Cart existingCart = cartRepository.findByUserIdAndMenuName(id, menuName);
+        Cart existingCart = cartRepository.findByIdAndMenuName(id, menuName);
 
         if (existingCart != null) {
             existingCart.setCount(existingCart.getCount() + 1); // 이미 있으면 개수 증가
             cartRepository.save(existingCart);
         } else {
             Menu menu = menuItem.get();
-            Cart cart = new Cart(id + menuName, id, menu.getMenuName(), menu.getMenuNameen(), 1, menu.getPrice());
+            Cart cart = new Cart(id, menu.getMenuName(), menu.getMenuNameen(), 1, menu.getPrice());
             cartRepository.save(cart);
         }
 
@@ -54,13 +54,13 @@ public class MenuService {
     }
 
     // 특정 사용자의 장바구니 목록 조회
-    public List<Cart> getCartItemsByUser(String userId) {
-        return cartRepository.findByUserId(userId);  // findByUserId로 수정
+    public Optional<Cart> getCartItemsByUser(String id) {
+        return cartRepository.findById(id);  // findByUserId로 수정
     }
 
     // 장바구니 수량 업데이트
-    public boolean updateCartItem(String userId, String menuName, int count) {
-        Cart existingCart = cartRepository.findByUserIdAndMenuName(userId, menuName);
+    public boolean updateCartItem(String id, String menuName, int count) {
+        Cart existingCart = cartRepository.findByIdAndMenuName(id, menuName);
 
         if (existingCart != null) {
             existingCart.setCount(count);
@@ -72,16 +72,16 @@ public class MenuService {
     }
 
     // 특정 사용자의 장바구니 아이템 가격 합 계산
-    public int calculateItemPrice(String userId) {
-        List<Cart> cartItems = cartRepository.findByUserId(userId); // 수정된 부분
+    public int calculateItemPrice(String id) {
+    	Optional<Cart> cartItems = cartRepository.findById(id); 
         return cartItems.stream()
                 .mapToInt(item -> item.getPrice() * item.getCount())
                 .sum();
     }
 
     // 전체 장바구니 합계 계산 (사용자별로 수정 가능)
-    public int calculateTotalSum(String userId) {
-        List<Cart> cartItems = cartRepository.findByUserId(userId);  // 수정된 부분
+    public int calculateTotalSum(String id) {
+    	Optional<Cart> cartItems = cartRepository.findById(id);  
         return cartItems.stream().mapToInt(item -> item.getPrice() * item.getCount()).sum();
     }
 }
