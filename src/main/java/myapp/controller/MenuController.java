@@ -24,7 +24,11 @@ public class MenuController {
 
     @Autowired
     private MenuService menuService;
+    @Autowired
     private CartRepository cartRepository;
+    public MenuController(CartRepository cartRepository) {
+        this.cartRepository = cartRepository;
+    }
 
     /**
      * 기본 메뉴 페이지 (GET 요청)
@@ -88,24 +92,26 @@ public class MenuController {
      * 로그인한 사용자의 장바구니 목록 조회
      */
     @GetMapping("/cart")
-    public String showCart(@RequestParam String userId, Model model) {
-    	Optional<Cart> cartItems = cartRepository.findById(userId);  // userId로 장바구니 아이템을 조회
+    public String showCart(Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = authentication.getName();  // 로그인된 사용자 ID 가져오기
+        List<Cart> cartItems = cartRepository.findByUserId(userId);  // userId로 장바구니 아이템을 조회
         model.addAttribute("cartItems", cartItems);
         return "menu/cart";  // 장바구니 페이지로 리턴
     }
 
     /**
-     * ✅ 장바구니 상품 수량 업데이트
+     * 장바구니 상품 수량 업데이트
      */
     @PostMapping("/cart/update")
     @ResponseBody
-    public String updateCartItem(@RequestParam String userId, @RequestParam String menuName, @RequestParam int count) {
-        Optional<Cart> cartItemOptional = cartRepository.findById(userId + menuName);
+    public String updateCartItem(@RequestParam String menuName, @RequestParam int count) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = authentication.getName();  // 로그인된 사용자 ID 가져오기
 
-        if (cartItemOptional.isPresent()) {
-            Cart cartItem = cartItemOptional.get();
-            cartItem.setCount(count);
-            cartRepository.save(cartItem);
+        boolean result = menuService.updateCartItem(userId, menuName, count);
+
+        if (result) {
             return "장바구니가 업데이트 되었습니다.";
         } else {
             return "장바구니에 해당 아이템이 없습니다.";

@@ -34,54 +34,42 @@ public class MenuService {
             return false;
         }
 
-        // 현재 로그인한 사용자 ID 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String id = authentication.getName(); // 현재 로그인한 사용자의 ID (username)
+        String userId = authentication.getName(); // 현재 로그인한 사용자의 ID
 
-        // 해당 메뉴와 사용자 아이디로 장바구니 항목 찾기
-        Cart existingCart = cartRepository.findByIdAndMenuName(id, menuName);
+        List<Cart> existingCart = cartRepository.findByUserId(userId);  // userId로 장바구니 항목 찾기
+        Optional<Cart> cart = existingCart.stream()
+                                          .filter(c -> c.getMenuName().equals(menuName))
+                                          .findFirst();
 
-        if (existingCart != null) {
-            existingCart.setCount(existingCart.getCount() + 1); // 이미 있으면 개수 증가
-            cartRepository.save(existingCart);
+        if (cart.isPresent()) {
+            cart.get().setCount(cart.get().getCount() + 1); // 이미 있으면 개수 증가
+            cartRepository.save(cart.get());
         } else {
             Menu menu = menuItem.get();
-            Cart cart = new Cart(id, menu.getMenuName(), menu.getMenuNameen(), 1, menu.getPrice());
-            cartRepository.save(cart);
+            Cart newCart = new Cart(userId, menu.getMenuName(), menu.getMenuNameen(), 1, menu.getPrice());
+            cartRepository.save(newCart);
         }
 
         return true;
     }
 
-    // 특정 사용자의 장바구니 목록 조회
-    public Optional<Cart> getCartItemsByUser(String id) {
-        return cartRepository.findById(id);  // findByUserId로 수정
+    public List<Cart> getCartItemsByUser(String userId) {
+        return cartRepository.findByUserId(userId);  // userId로 장바구니 항목 조회
     }
 
-    // 장바구니 수량 업데이트
-    public boolean updateCartItem(String id, String menuName, int count) {
-        Cart existingCart = cartRepository.findByIdAndMenuName(id, menuName);
+    public boolean updateCartItem(String userId, String menuName, int count) {
+        List<Cart> existingCartItems = cartRepository.findByUserId(userId);
+        Optional<Cart> existingCart = existingCartItems.stream()
+                                                      .filter(cart -> cart.getMenuName().equals(menuName))
+                                                      .findFirst();
 
-        if (existingCart != null) {
-            existingCart.setCount(count);
-            cartRepository.save(existingCart);
+        if (existingCart.isPresent()) {
+            existingCart.get().setCount(count);
+            cartRepository.save(existingCart.get());
             return true;
         }
 
         return false;
-    }
-
-    // 특정 사용자의 장바구니 아이템 가격 합 계산
-    public int calculateItemPrice(String id) {
-    	Optional<Cart> cartItems = cartRepository.findById(id); 
-        return cartItems.stream()
-                .mapToInt(item -> item.getPrice() * item.getCount())
-                .sum();
-    }
-
-    // 전체 장바구니 합계 계산 (사용자별로 수정 가능)
-    public int calculateTotalSum(String id) {
-    	Optional<Cart> cartItems = cartRepository.findById(id);  
-        return cartItems.stream().mapToInt(item -> item.getPrice() * item.getCount()).sum();
     }
 }
