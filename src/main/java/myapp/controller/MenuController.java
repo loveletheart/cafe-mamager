@@ -105,16 +105,29 @@ public class MenuController {
      */
     @PostMapping("/cart/update")
     @ResponseBody
-    public String updateCartItem(@RequestParam String menuName, @RequestParam int count) {
+    public ResponseEntity<?> updateCartItem(@RequestBody Map<String, Object> requestData) {
+        String menuName = (String) requestData.get("menuName");
+        int count = (int) requestData.get("count");
+
+        // 로그인된 사용자 ID 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userId = authentication.getName();  // 로그인된 사용자 ID 가져오기
-
+        String userId = authentication.getName();
+        // 장바구니 업데이트
         boolean result = menuService.updateCartItem(userId, menuName, count);
-
+        // 전체 합계 계산
+        int totalSum = menuService.calculateTotalSum(userId);
+        // 응답 데이터 생성
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", result);
+        response.put("totalSum", totalSum);
+        
+        // 아이템 가격 정보 추가
         if (result) {
-            return "장바구니가 업데이트 되었습니다.";
-        } else {
-            return "장바구니에 해당 아이템이 없습니다.";
+            int updatedPrice = count * menuService.getPrice(userId,menuName);
+            System.out.print(updatedPrice);
+            response.put("updatedPrice", updatedPrice);
         }
+
+        return ResponseEntity.ok(response);
     }
 }

@@ -188,7 +188,7 @@
 	            fetch('/menu/cart/update', {
 	                method: 'POST',
 	                headers: { 'Content-Type': 'application/json' },
-	                body: JSON.stringify({ id: itemId, count: newCount })
+	                body: JSON.stringify({ menuName: itemId, count: newCount })
 	            })
 	            .then(response => response.json())
 	            .then(data => {
