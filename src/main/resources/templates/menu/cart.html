@@ -153,7 +153,7 @@
     <!-- menu 페이지로 이동하는 버튼 -->
     <div style="margin-top: 20px; text-align: center;">
         <a href="/menu" class="back-button">메뉴로 돌아가기</a>
-        <a href="/menu" class="payment-button">결제하기(미구현)</a>
+        <a href="/menu" class="payment-button">구매하기</a>
     </div>
     
     <script>
@@ -211,6 +211,40 @@
 	        function updateTotalSum(newTotalSum) {
 	            document.getElementById('total-sum').textContent = newTotalSum;
 	        }
+	    });
+	    
+	    //구매하기 버튼 클릭 시 실행
+	    document.getElementById("checkout-button").addEventListener("click", function() {
+	        // 장바구니에 있는 상품 정보 가져오기
+	        var cartItems = [];
+	        document.querySelectorAll(".cart-item").forEach(item => {
+	            var menuName = item.getAttribute("data-menu-name");//메뉴명
+	            var quantity = parseInt(item.getAttribute("data-quantity"));//메뉴 개수
+	            var userId = document.getElementById("user-id").value; // 사용자 ID
+
+	            cartItems.push({
+	                userId: userId,
+	                menuName: menuName,
+	                quantity: quantity
+	            });
+	        });
+
+	        // 서버로 주문 정보 전송
+	        fetch("/order/checkout", {
+	            method: "POST",
+	            headers: {
+	                "Content-Type": "application/json"
+	            },
+	            body: JSON.stringify(cartItems)
+	        })
+	        .then(response => {
+	            if (response.ok) {
+	                window.location.href = "/order/complete"; // 주문 완료 페이지로 이동
+	            } else {
+	                alert("결제 처리 중 오류가 발생했습니다.");
+	            }
+	        })
+	        .catch(error => console.error("Error:", error));
 	    });
     </script>
 </body>

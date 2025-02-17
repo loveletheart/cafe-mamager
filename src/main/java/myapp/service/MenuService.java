@@ -47,7 +47,7 @@ public class MenuService {
             cartRepository.save(cart.get());
         } else {
             Menu menu = menuItem.get();
-            Cart newCart = new Cart(userId, menu.getMenuName(), menu.getMenuNameen(), 1, menu.getPrice());
+            Cart newCart = new Cart(userId, menu.getMenuName(), menu.getMenuNameen(), 1, menu.getPrice());//없으면 새로 추가
             cartRepository.save(newCart);
         }
 
@@ -81,7 +81,7 @@ public class MenuService {
                         .sum();
     }
     
-    // 메뉴 가격 가져오는 메서드 (필요하면 추가)
+    // 메뉴 가격 가져오는 메서드
     public int getPrice(String userId,String menuName) {
         Optional<Cart> menuData = cartRepository.findByuserIdAndMenuName(userId, menuName);
         return menuData.map(Cart::getPrice).orElse(0);

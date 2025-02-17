@@ -112,10 +112,13 @@ public class MenuController {
         // 로그인된 사용자 ID 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
+        
         // 장바구니 업데이트
         boolean result = menuService.updateCartItem(userId, menuName, count);
+        
         // 전체 합계 계산
         int totalSum = menuService.calculateTotalSum(userId);
+        
         // 응답 데이터 생성
         Map<String, Object> response = new HashMap<>();
         response.put("success", result);
