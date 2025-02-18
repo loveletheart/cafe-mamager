@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>장바구니</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery가 반드시 먼저 로드되어야 함 -->
     <style>
    		.body {
    			text-align: center;
@@ -153,12 +154,11 @@
     <!-- menu 페이지로 이동하는 버튼 -->
     <div style="margin-top: 20px; text-align: center;">
         <a href="/menu" class="back-button">메뉴로 돌아가기</a>
-        <a href="/menu" class="payment-button">구매하기</a>
+        <button class="payment-button" id="checkoutButton">구매하기</button>
     </div>
     
     <script>
 	    document.addEventListener('DOMContentLoaded', function () {
-	    	
 	        // 수량 증가 버튼
 	        document.querySelectorAll('.increase-btn').forEach(button => {
 	            button.addEventListener('click', function () {
@@ -214,38 +214,39 @@
 	    });
 	    
 	    //구매하기 버튼 클릭 시 실행
-	    document.getElementById("checkout-button").addEventListener("click", function() {
-	        // 장바구니에 있는 상품 정보 가져오기
-	        var cartItems = [];
-	        document.querySelectorAll(".cart-item").forEach(item => {
-	            var menuName = item.getAttribute("data-menu-name");//메뉴명
-	            var quantity = parseInt(item.getAttribute("data-quantity"));//메뉴 개수
-	            var userId = document.getElementById("user-id").value; // 사용자 ID
+		$(document).ready(function () {
+		    $("#checkoutButton").click(function () {
+		        var cartItems = [];
+		
+		        // 장바구니 항목들을 객체로 변환
+		        $(".cart-item").each(function () {
+		            var item = {
+		                menuName: $(this).find(".menu-name").text(),
+		                userId: $(this).data("user-id"), // 사용자 ID (data 속성에서 가져오기)
+		                quantity: parseInt($(this).find(".quantity").val()), // 수량
+		                price: parseInt($(this).find(".price").text()) // 가격
+		            };
+		            cartItems.push(item);
+		        });
+		
+		        // AJAX 요청으로 서버에 데이터 전송
+		        $.ajax({
+		            url: "/order/checkout",
+		            type: "POST",
+		            contentType: "application/json",
+		            data: JSON.stringify(cartItems),
+		            success: function (response) {
+		                alert("주문이 완료되었습니다!");
+		                window.location.href = "/menu/coffee"; // 주문 완료 페이지로 이동
+		            },
+		            error: function (xhr, status, error) {
+		                alert("주문 처리 중 오류가 발생했습니다.");
+		                console.error("에러 메시지:", error);
+		            }
+		        });
+		    });
+		});
 
-	            cartItems.push({
-	                userId: userId,
-	                menuName: menuName,
-	                quantity: quantity
-	            });
-	        });
-
-	        // 서버로 주문 정보 전송
-	        fetch("/order/checkout", {
-	            method: "POST",
-	            headers: {
-	                "Content-Type": "application/json"
-	            },
-	            body: JSON.stringify(cartItems)
-	        })
-	        .then(response => {
-	            if (response.ok) {
-	                window.location.href = "/order/complete"; // 주문 완료 페이지로 이동
-	            } else {
-	                alert("결제 처리 중 오류가 발생했습니다.");
-	            }
-	        })
-	        .catch(error => console.error("Error:", error));
-	    });
     </script>
 </body>
 </html>
