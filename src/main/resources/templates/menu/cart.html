@@ -215,38 +215,48 @@
 	    
 	    //구매하기 버튼 클릭 시 실행
 		$(document).ready(function () {
-		    $("#checkoutButton").click(function () {
-		        var cartItems = [];
-		
-		        // 장바구니 항목들을 객체로 변환
-		        $(".cart-item").each(function () {
-		            var item = {
-		                menuName: $(this).find(".menu-name").text(),
-		                userId: $(this).data("user-id"), // 사용자 ID (data 속성에서 가져오기)
-		                quantity: parseInt($(this).find(".quantity").val()), // 수량
-		                price: parseInt($(this).find(".price").text()) // 가격
-		            };
-		            cartItems.push(item);
-		        });
-		
-		        // AJAX 요청으로 서버에 데이터 전송
-		        $.ajax({
-		            url: "/order/checkout",
-		            type: "POST",
-		            contentType: "application/json",
-		            data: JSON.stringify(cartItems),
-		            success: function (response) {
-		                alert("주문이 완료되었습니다!");
-		                window.location.href = "/menu/coffee"; // 주문 완료 페이지로 이동
-		            },
-		            error: function (xhr, status, error) {
-		                alert("주문 처리 중 오류가 발생했습니다.");
-		                console.error("에러 메시지:", error);
-		            }
-		        });
-		    });
-		});
+    $("#checkoutButton").click(function () {
+        var cartItems = [];
 
+        // 장바구니 항목들을 객체로 변환
+	        $("tr[data-menu-name]").each(function () { // 각 장바구니 행에 접근
+	            var menuName = $(this).attr("data-menu-name");
+	            var quantity = parseInt($(this).find(".item-count").val());
+	            var priceText = $(this).find("td:nth-last-child(1)").text(); // 가격 텍스트 가져오기
+	            var price = parseInt(priceText.replace("원", "").trim()); // "원" 제거 후 숫자로 변환
+	
+	            if (quantity > 0) { // 수량이 0 이상인 항목만 전송
+	                var item = {
+	                    menuName: menuName,
+	                    quantity: quantity,
+	                    price: price
+	                };
+	                cartItems.push(item);
+	            }
+	        });
+	
+	        if (cartItems.length === 0) {
+	            alert("장바구니가 비어 있습니다.");
+	            return;
+	        }
+	
+	        // AJAX 요청으로 서버에 데이터 전송
+	        $.ajax({
+	            url: "/order/checkout",
+	            type: "POST",
+	            contentType: "application/json",
+	            data: JSON.stringify(cartItems),
+	            success: function (response) {
+	                alert("주문이 완료되었습니다!");
+	                window.location.href = "/menu/coffee"; // 주문 완료 페이지로 이동
+	            },
+	            error: function (xhr, status, error) {
+	                alert("주문 처리 중 오류가 발생했습니다.");
+	                console.error("에러 메시지:", error);
+	            }
+	        });
+	    });
+	});
     </script>
 </body>
 </html>

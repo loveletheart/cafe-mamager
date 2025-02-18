@@ -1,5 +1,6 @@
 package myapp.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +13,8 @@ import java.util.List;
 @Controller
 @RequestMapping("/order")
 public class OrderController {
-
+	
+	@Autowired
     private final OrderService orderService;
 
     // 의존성 주입 (OrderService 사용)
@@ -26,7 +28,13 @@ public class OrderController {
     @PostMapping("/checkout")
     @ResponseBody
     public ResponseEntity<String> checkout(@RequestBody List<Order> orderRequests) {
+    	System.out.println("orderRequests: " + orderRequests);
+    	if (orderRequests == null || orderRequests.isEmpty()) {
+    	    System.out.println("orderRequests가 비어 있음.");
+    	    return ResponseEntity.badRequest().body("주문 데이터가 없습니다.");
+    	}
         for (Order order : orderRequests) {
+        	System.out.print("test");
             orderService.saveOrder(order); // 주문 데이터 저장
         }
         return ResponseEntity.ok("주문이 완료되었습니다.");
