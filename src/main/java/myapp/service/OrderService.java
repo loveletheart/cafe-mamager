@@ -22,7 +22,6 @@ public class OrderService {
      * 개별 주문 저장
      */
     public Order saveOrder(Order order) {
-    	System.out.print(order.getId());
         return orderRepository.save(order);
     }
 

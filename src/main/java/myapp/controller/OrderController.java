@@ -1,5 +1,7 @@
 package myapp.controller;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -28,13 +30,17 @@ public class OrderController {
     @PostMapping("/checkout")
     @ResponseBody
     public ResponseEntity<String> checkout(@RequestBody List<Order> orderRequests) {
-    	System.out.println("orderRequests: " + orderRequests);
-    	if (orderRequests == null || orderRequests.isEmpty()) {
+    	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    	String userID = authentication.getName();  // 기본적으로 username 반환
+    	
+    	if (orderRequests == null || orderRequests.isEmpty()) {//orderRequests안에 데이터가 없는 경우
     	    System.out.println("orderRequests가 비어 있음.");
     	    return ResponseEntity.badRequest().body("주문 데이터가 없습니다.");
     	}
+    	
         for (Order order : orderRequests) {
-        	System.out.print("test");
+        	order.setuserId(userID);//유저 아이디 추가
+        	order.setsituation("주문완료");//주문상태변경
             orderService.saveOrder(order); // 주문 데이터 저장
         }
         return ResponseEntity.ok("주문이 완료되었습니다.");

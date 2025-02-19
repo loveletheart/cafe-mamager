@@ -12,8 +12,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import jakarta.servlet.http.HttpSession;
-
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import java.util.*;
@@ -58,7 +56,7 @@ public class MenuController {
         int pageSize = 12;  // 한 페이지당 12개의 아이템을 표시
         Page<Menu> menuPage = menuService.getMenuByCategory(category, page, pageSize);
 
-        String viewName = "menu/" + category; // 뷰 이름 지정 (ex: menu/coffee, menu/aid)
+        String viewName = "menu/" + category; // 뷰 이름 지정
         ModelAndView modelAndView = new ModelAndView(viewName);
 
         modelAndView.addObject("menus", menuPage.getContent());  // 메뉴 데이터 추가

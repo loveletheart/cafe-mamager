@@ -220,16 +220,18 @@
 
         // 장바구니 항목들을 객체로 변환
 	        $("tr[data-menu-name]").each(function () { // 각 장바구니 행에 접근
-	            var menuName = $(this).attr("data-menu-name");
-	            var quantity = parseInt($(this).find(".item-count").val());
+	            var menuName = $(this).attr("data-menu-name");//메뉴 이름 가져오기
+	            var quantity = parseInt($(this).find(".item-count").val());//메뉴 개수 가져오기
 	            var priceText = $(this).find("td:nth-last-child(1)").text(); // 가격 텍스트 가져오기
 	            var price = parseInt(priceText.replace("원", "").trim()); // "원" 제거 후 숫자로 변환
+	            var userId = $(this).data("user-id"); // 사용자 ID 추가
 	
 	            if (quantity > 0) { // 수량이 0 이상인 항목만 전송
 	                var item = {
 	                    menuName: menuName,
 	                    quantity: quantity,
-	                    price: price
+	                    price: price,
+	                    userId: userId
 	                };
 	                cartItems.push(item);
 	            }
