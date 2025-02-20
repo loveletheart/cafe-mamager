@@ -38,11 +38,8 @@ public class OrderController {
     	    return ResponseEntity.badRequest().body("주문 데이터가 없습니다.");
     	}
     	
-        for (Order order : orderRequests) {
-        	order.setuserId(userID);//유저 아이디 추가
-        	order.setsituation("주문완료");//주문상태변경
-            orderService.saveOrder(order); // 주문 데이터 저장
-        }
+    	orderService.processOrder(orderRequests, userID);
+    	
         return ResponseEntity.ok("주문이 완료되었습니다.");
     }
 
