@@ -11,6 +11,8 @@ import jakarta.persistence.Table;
 public class Order {
 	
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID) // String 타입의 UUID 사용
+    private String id;
     private String userId;    // 주문한 사용자 ID
     
     private String menuName;  // 주문한 메뉴 이름

@@ -27,13 +27,16 @@ public class OrderService {
     @Transactional
     public boolean processOrder(List<Order> orderRequests, String userId) {
     	try {
-            // 1️⃣ 주문 저장
+            // 주문 저장
             for (Order order : orderRequests) {
+            	System.out.println("DB에 저장: " + order.getMenuName() + ", 수량: " + order.getQuantity());
                 order.setuserId(userId);
+                order.setsituation("주문완료");
                 orderRepository.save(order);
+                orderRepository.flush();
             }
 
-            // 2️⃣ 주문이 완료되면 장바구니 삭제
+            // 주문이 완료되면 장바구니 삭제
             cartRepository.deleteByUserId(userId);
 
             return true;  // 주문 및 장바구니 삭제 성공

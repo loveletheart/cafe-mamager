@@ -3,6 +3,7 @@ package myapp.controller;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -38,9 +39,13 @@ public class OrderController {
     	    return ResponseEntity.badRequest().body("주문 데이터가 없습니다.");
     	}
     	
-    	orderService.processOrder(orderRequests, userID);
+    	boolean success = orderService.processOrder(orderRequests, userID);
     	
-        return ResponseEntity.ok("주문이 완료되었습니다.");
+    	if (success) {
+            return ResponseEntity.ok("주문이 완료되었습니다.");
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("주문 처리 중 오류가 발생했습니다.");
+        }
     }
 
 
