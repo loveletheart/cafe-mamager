@@ -33,7 +33,7 @@ public class LoginController {
      */
     @GetMapping("/register")
     public String showRegisterPage(Model model) {
-        return "/register";
+        return "register";
     }
 
     /**
@@ -55,7 +55,7 @@ public class LoginController {
         if (!success) {
             // 회원가입 실패 시 오류 메시지 모델에 추가하고 회원가입 페이지를 다시 보여줍니다.
             model.addAttribute("errorMessage", "이미 존재하는 ID 또는 Username입니다.");
-            return "login/register";
+            return "register";
         }
         // 회원가입 성공 시 로그인 페이지로 리디렉션
         return "redirect:/login";
