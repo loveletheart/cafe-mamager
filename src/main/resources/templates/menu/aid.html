@@ -80,7 +80,20 @@
 		    cursor: pointer;               /* 커서를 포인터로 변경 */
 		    transition: background-color 0.3s ease; /* 호버 시 배경색 전환 효과 */
 		}
+		.add-to-cart-button {
+		    border-radius: 20px; /* 모서리를 둥글게 */
+		    font-size: 20px; /* 글씨 크기 */
+		    font-weight: bold; /* 글씨 굵게 */
+		    background-color: white; /* 버튼 배경색 */
+		    color: #4682B4; /* 글씨 색상 */
+		    border: 1px solid #4682B4; /* 얇은 하늘색 테두리 */
+		    padding: 10px 20px; /* 버튼 내부 여백 */
+		    cursor: pointer; /* 클릭 가능하도록 설정 */
+		    transition: all 0.3s ease; /* 부드러운 변화 효과 */
+		}
     </style>
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
 </head>
 <body>
     <h1>Menu</h1>
@@ -97,8 +110,8 @@
         <div class="menu-item" th:each="menu : ${menus}">
         	<img th:src="@{|./../images/${menu.menuNameen}.jpg|}" th:alt="${menu.menuNameen}" style="width:300px;height:auto;"><!-- 표현식 처리를 해결하기 위해 리터널 블록 사용 -->
             <p><span th:text="${menu.menuName}" style="font-size: 24px; font-weight: bold;">Menu Name</span></p>
-            <p><span th:text="${menu.price}" style="font-size: 18px; font-weight: bold;">Menu Price</span></p>
-            <button th:data-menuName='${menu.menuName}'>장바구니에 담기</button>
+			<p><span th:text="${menu.price}" style="font-size: 19px; font-weight: bold;"></span><span style="font-size: 1em;"> ₩</span></p>
+            <button class="add-to-cart-button" th:data-menuName='${menu.menuName}'>장바구니에 담기</button>
         </div>
     </div>
     
@@ -135,6 +148,8 @@
     </div>
     
     <script>
+	    var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+	    var csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 		$(document).ready(function() {
 	        // addToCart 함수 정의
 	        window.addToCart = function(menuName) {
@@ -143,6 +158,9 @@
 	                url: '/menu/add',
 	                data: JSON.stringify({ menuName: menuName }),
 	                contentType: 'application/json',
+	                beforeSend: function(xhr) {
+	                    xhr.setRequestHeader(csrfHeader, csrfToken); // CSRF 토큰 추가
+	                },
 	                success: function(response) {
 	                    alert("상품이 장바구니에 추가되었습니다.");
 	                },
