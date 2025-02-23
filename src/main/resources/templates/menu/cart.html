@@ -160,6 +160,10 @@
     </div>
     
     <script>
+	 	// CSRF 토큰 가져오기
+	    const csrfToken = $("meta[name='_csrf']").attr("content");
+	    const csrfHeader = $("meta[name='_csrf_header']").attr("content");
+	    
 	    document.addEventListener('DOMContentLoaded', function () {
 	        // 수량 증가 버튼
 	        document.querySelectorAll('.increase-btn').forEach(button => {
@@ -187,9 +191,6 @@
 	
 	        // AJAX로 수량 업데이트
 	        function updateItemCount(itemId, newCount, countInput) {
-			    // CSRF 토큰 가져오기
-			    const csrfToken = $("meta[name='_csrf']").attr("content");
-			    const csrfHeader = $("meta[name='_csrf_header']").attr("content");
 			
 			    $.ajax({
 			        url: '/menu/cart/update',
