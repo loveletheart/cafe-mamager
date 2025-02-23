@@ -125,7 +125,6 @@ public class MenuController {
         // 아이템 가격 정보 추가
         if (result) {
             int updatedPrice = count * menuService.getPrice(userId,menuName);
-            System.out.print(updatedPrice);
             response.put("updatedPrice", updatedPrice);
         }
 
