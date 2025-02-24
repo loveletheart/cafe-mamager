@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import myapp.service.OrderService;
@@ -50,7 +51,7 @@ public class OrderController {
 
 
     /**
-     * 주문 완료 페이지로 이동
+     * 주문 완료 페이지로 이동(다시 메인 페이지로 이동)
      */
     @GetMapping("/complete")
     public String orderComplete() {
@@ -58,11 +59,10 @@ public class OrderController {
     }
 
     /**
-     * 주문 목록을 조회하여 ods.html 화면에 전달
+     * 전체 주문 내역을 ods.html 템플릿에 전달하여 출력
      */
     @GetMapping("/list")
-    @ResponseBody
-    public List<Order> getOrderList() {
-        return orderService.getAllOrders(); // 모든 주문 데이터를 반환
+    public List<Order> getCompletedOrders() {
+        return orderService.getCompletedOrders("주문완료");
     }
 }

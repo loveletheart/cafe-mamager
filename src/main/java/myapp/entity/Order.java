@@ -1,10 +1,16 @@
 package myapp.entity;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Date;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 
 @Entity
 @Table(name = "orders") // 테이블 이름
@@ -19,6 +25,9 @@ public class Order {
     private int quantity;     // 수량
     private int price;        // 가격
     private String situation; // 현재상태
+    
+    private LocalDate orderDate; // 날짜만 저장
+    private LocalTime orderTime; // 시간만 저장
 
     // 기본 생성자
     public Order() {}
@@ -71,6 +80,11 @@ public class Order {
 
     public void setsituation(String situation) {
         this.situation = situation;
+    }
+    
+    public void setOrderDateTime(LocalDate orderDate, LocalTime orderTime) {
+        this.orderDate = orderDate;
+        this.orderTime = orderTime;
     }
 }
 

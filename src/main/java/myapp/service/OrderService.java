@@ -7,6 +7,8 @@ import myapp.entity.Order;
 import myapp.repository.CartRepository;
 import myapp.repository.OrderRepository;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -20,18 +22,15 @@ public class OrderService {
         this.cartRepository = cartRepository;
     }
 
-    /**
-     * 개별 주문 저장
-     * @return 
-     */
+    //개별 주문 저장
     @Transactional
     public boolean processOrder(List<Order> orderRequests, String userId) {
     	try {
             // 주문 저장
             for (Order order : orderRequests) {
-            	System.out.println("DB에 저장: " + order.getMenuName() + ", 수량: " + order.getQuantity());
                 order.setuserId(userId);
                 order.setsituation("주문완료");
+                order.setOrderDateTime(LocalDate.now(), LocalTime.now());//현재 날짜와 현재 시간 따로 저장
                 orderRepository.save(order);
                 orderRepository.flush();
             }
@@ -45,10 +44,8 @@ public class OrderService {
         }
     }
 
-    /**
-     * 주문 목록 가져오기
-     */
-    public List<Order> getAllOrders() {
-        return orderRepository.findAll();
+    // 주문 상태가 "주문완료"인 주문들만 가져옴
+    public List<Order> getCompletedOrders(String situation) {
+        return orderRepository.findBySituation(situation);
     }
 }
