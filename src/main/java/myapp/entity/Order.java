@@ -83,8 +83,24 @@ public class Order {
     }
     
     public void setOrderDateTime(LocalDate orderDate, LocalTime orderTime) {
-        this.orderDate = orderDate;
-        this.orderTime = orderTime;
+        this.setOrderDate(orderDate);
+        this.setOrderTime(orderTime);
     }
+
+	public LocalTime getOrderTime() {
+		return orderTime;
+	}
+
+	public void setOrderTime(LocalTime orderTime) {
+		this.orderTime = orderTime;
+	}
+
+	public LocalDate getOrderDate() {
+		return orderDate;
+	}
+
+	public void setOrderDate(LocalDate orderDate) {
+		this.orderDate = orderDate;
+	}
 }
 

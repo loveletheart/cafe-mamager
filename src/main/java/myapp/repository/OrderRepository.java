@@ -1,5 +1,6 @@
 package myapp.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,4 +11,6 @@ import myapp.entity.Order;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, String> {
 	List<Order> findBySituation(String situation);
+	
+	List<Order> findBySituationAndOrderDate(String situation,LocalDate localDate);
 }
