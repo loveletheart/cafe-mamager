@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>QR 로그인</title>
+</head>
+<body>
+    <h1>QR 로그인</h1>
+    <div>
+        <h3>아래 QR 코드 중 하나를 스캔하여 로그인하세요.</h3>
+        <div th:each="id : ${#numbers.sequence(1, 5)}">
+            <img th:src="@{'/qr_codes/qr_' + ${id} + '.png'}" width="200" height="200"/>
+            <p>ID: <span th:text="${id}"></span></p>
+        </div>
+    </div>
+</body>
+</html>

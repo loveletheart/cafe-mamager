@@ -24,9 +24,6 @@ public class MenuController {
     private MenuService menuService;
     @Autowired
     private CartRepository cartRepository;
-    public MenuController(CartRepository cartRepository) {
-        this.cartRepository = cartRepository;
-    }
 
     /**
      * 기본 메뉴 페이지 (GET 요청)

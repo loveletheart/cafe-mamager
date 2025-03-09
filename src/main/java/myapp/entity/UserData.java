@@ -3,10 +3,10 @@ package myapp.entity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -17,29 +17,37 @@ public class UserData implements UserDetails {
     private static final long serialVersionUID = 1L;
     
     @Id
+    @Column(nullable = false, unique = true)
     private String id;
+
+    @Column(nullable = false, unique = true)
     private String username;
+
+    @Column(nullable = false)
     private String password;
-    private String role;  // Role을 소문자 'role'로 변경
+
+    @Column(nullable = false)
+    private String role;
+
+    @Column(unique = true)
+    private String qrCode; // QR 코드 저장 필드
 
     // 기본 생성자
     public UserData() {}
 
-    // 파라미터를 받는 생성자
-    public UserData(String id, String username, String password, String role) {
+    // 전체 필드를 포함하는 생성자
+    public UserData(String id, String username, String password, String role, String qrCode) {
         this.id = id;
         this.username = username;
         this.password = password;
-        this.role = role;  // 'Role' -> 'role'로 수정
+        this.role = role;
+        this.qrCode = qrCode;
     }
-    
-    // UserDetails 메서드 구현
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // role을 권한으로 변환
         List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(role));  // role을 권한으로 추가
+        authorities.add(new SimpleGrantedAuthority(role));
         return authorities;
     }
 
@@ -50,7 +58,7 @@ public class UserData implements UserDetails {
 
     @Override
     public String getUsername() {
-        return id; // id를 username으로 사용
+        return username; // username 반환 (기존 id에서 변경)
     }
 
     @Override
@@ -74,7 +82,6 @@ public class UserData implements UserDetails {
     }
 
     // Getter 및 Setter 추가
-
     public String getId() {
         return id;
     }
@@ -86,15 +93,24 @@ public class UserData implements UserDetails {
     public void setUsername(String username) {
         this.username = username;
     }
+
     public void setPassword(String password) {
         this.password = password;
     }
 
     public String getRole() {
-        return role;  // role 반환
+        return role;
     }
 
     public void setRole(String role) {
-        this.role = role;  // role 설정
+        this.role = role;
+    }
+
+    public String getQrCode() {
+        return qrCode;
+    }
+
+    public void setQrCode(String qrCode) {
+        this.qrCode = qrCode;
     }
 }

@@ -6,4 +6,5 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<UserData, String> {
     Optional<UserData> findById(String id);
+    Optional<UserData> findByQrCode(String qrCode);
 }
