@@ -14,7 +14,7 @@
     }
     .login-wrapper {
         width: 400px;
-        height: 350px;
+        height: 400px; /* 높이 증가 */
         padding: 40px;
         box-sizing: border-box;
     }
@@ -35,11 +35,20 @@
     #login-form > input::placeholder {
         color: #D2D2D2;
     }
-    #login-form > input[type="submit"] {
+    #login-form > input[type="submit"], .qr-login-btn {
         color: #fff;
         font-size: 16px;
         background-color: #6A24FE;
         margin-top: 20px;
+        cursor: pointer;
+        display: block;
+        text-align: center;
+        padding: 12px;
+        border-radius: 6px;
+        text-decoration: none;
+    }
+    .qr-login-btn {
+        background-color: #28a745; /* 초록색 버튼 */
     }
 </style>
 <script>
@@ -63,6 +72,10 @@
 		    </label>
 		    <input type="submit" value="Login">
 		</form>
+        
+        <!-- QR 로그인 버튼 추가 -->
+        <a th:href="@{/QRlogin}" class="qr-login-btn">QR로 로그인하기</a>
+
         <p>회원가입페이지 <a th:href="@{/register}">회원가입하기</a></p>
     </div>
 </body>
