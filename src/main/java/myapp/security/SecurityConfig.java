@@ -16,7 +16,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/register", "/css/**", "/js/**","/QRlogin","/").permitAll()  // /register를 포함하여 접근 허용
+                .requestMatchers("/login", "/register","/QRlogin","/").permitAll()  // /register를 포함하여 접근 허용
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

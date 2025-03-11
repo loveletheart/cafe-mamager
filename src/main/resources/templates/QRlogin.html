@@ -10,9 +10,9 @@
 
     <h3>아래 QR 코드 중 하나를 스캔하여 로그인하세요.</h3>
     <div th:each="id : ${ids}">
-        <img th:src="@{'/qr_codes/qr_' + ${id} + '.png'}" width="200" height="200"/>
-        <p>ID: <span th:text="${id}"></span></p>
-    </div>
+    	<p>ID: <span th:text="${id}"></span></p>
+	    <img th:src="@{'/qr_codes/' + ${id} + '_qr.png'} + '?t=' + ${#dates.createNow().getTime()}" width="200" height="200"/>
+	</div>
 
     <h2>QR 코드 스캔</h2>
     <video id="camera" autoplay style="width: 300px; height: 300px;"></video>

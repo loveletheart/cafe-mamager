@@ -47,12 +47,14 @@ public class LoginController {
                                       @RequestParam String username,
                                       @RequestParam String role,
                                       Model model) {
-        boolean success = userService.registerUser(id, username, password, role);
+        System.out.println("회원가입 요청 받음: " + id); // 로그 확인용
+        boolean success = userService.registerUser(id, password, username, role);
+        
         if (!success) {
             model.addAttribute("errorMessage", "이미 존재하는 ID 또는 Username입니다.");
-            return "register";
+            return "register"; // 실패 시 회원가입 페이지 다시 표시
         }
-        return "redirect:/login";
+        return "redirect:/login"; // 성공 시 로그인 페이지로 이동
     }
     
     /**
