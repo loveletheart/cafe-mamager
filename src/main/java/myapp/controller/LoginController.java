@@ -47,14 +47,14 @@ public class LoginController {
                                       @RequestParam String username,
                                       @RequestParam String role,
                                       Model model) {
-        System.out.println("회원가입 요청 받음: " + id); // 로그 확인용
+        System.out.println("회원가입 요청 받음: " + id);
         boolean success = userService.registerUser(id, password, username, role);
         
         if (!success) {
             model.addAttribute("errorMessage", "이미 존재하는 ID 또는 Username입니다.");
             return "register"; // 실패 시 회원가입 페이지 다시 표시
         }
-        return "redirect:/login"; // 성공 시 로그인 페이지로 이동
+        return "redirect:/menu"; // 성공 시 로그인 페이지로 이동
     }
     
     /**
@@ -80,11 +80,19 @@ public class LoginController {
     }
     
     @PostMapping("/login/qr")
-    public String loginWithQR(@RequestParam String qrCode) {
+    public String loginWithQR(@RequestParam String qrCode, Model model) {
         Optional<UserData> user = userService.getUserByQRCode(qrCode);
         if (user.isPresent()) {
-            return "redirect:/menu"; // QR 코드 로그인 성공
+            // QR 코드로 찾은 사용자 정보를 세션에 저장하여 로그인 처리
+            UserData loggedInUser = user.get();
+            model.addAttribute("user", loggedInUser);
+            
+            // 바로 메뉴 페이지로 이동
+            return "redirect:/menu";
         }
-        return "redirect:/login?error=true";
+
+        //로그인 실패 시 QR 로그인 페이지로 다시 이동
+        model.addAttribute("loginError", "QR 코드가 유효하지 않습니다.");
+        return "QRlogin";
     }
 }

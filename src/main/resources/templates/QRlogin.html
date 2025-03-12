@@ -2,52 +2,91 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR 로그인</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.3.2/jsQR.min.js"></script>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        #reader {
+            width: 300px;
+            margin: auto;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #6A24FE;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #5317D5;
+        }
+        #result {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+    </style>
 </head>
 <body>
     <h1>QR 로그인</h1>
+    <div id="reader"></div>
+    <p id="result">QR 코드를 스캔하세요.</p>
+    <button id="start-btn">QR 스캐너 시작</button>
 
-    <h3>아래 QR 코드 중 하나를 스캔하여 로그인하세요.</h3>
-    <div th:each="id : ${ids}">
-    	<p>ID: <span th:text="${id}"></span></p>
-	    <img th:src="@{'/qr_codes/' + ${id} + '_qr.png'} + '?t=' + ${#dates.createNow().getTime()}" width="200" height="200"/>
-	</div>
-
-    <h2>QR 코드 스캔</h2>
-    <video id="camera" autoplay style="width: 300px; height: 300px;"></video>
-    <canvas id="qrCanvas" hidden></canvas>
-    <p id="qrResult"></p>
-
+    <!-- html5-qrcode 라이브러리 추가 (최신 버전) -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+	<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+ 	
     <script>
-        const video = document.getElementById("camera");
-        const canvas = document.getElementById("qrCanvas");
-        const context = canvas.getContext("2d");
-        const resultText = document.getElementById("qrResult");
+    document.addEventListener("DOMContentLoaded", function () {
+        const startButton = document.getElementById("start-btn");
+        const resultElement = document.getElementById("result");
 
-        // 카메라 활성화
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-            .then(stream => {
-                video.srcObject = stream;
-                scanQRCode();
-            })
-            .catch(err => console.error("카메라 접근 불가: ", err));
+        startButton.addEventListener("click", function () {
+            // html5Qrcode 인스턴스 생성
+            const html5Qrcode = new Html5Qrcode("reader");
 
-        function scanQRCode() {
-            setInterval(() => {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                
-                let imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                let code = jsQR(imageData.data, imageData.width, imageData.height);
-                
-                if (code) {
-                    resultText.innerText = "QR 코드 인식됨: " + code.data;
-                    window.location.href = "/login/qr?qrCode=" + encodeURIComponent(code.data);
-                }
-            }, 1000);
-        }
+            // 스캔 성공 및 실패 콜백 함수
+            function onScanSuccess(decodedText, decodedResult) {
+                console.log("QR 인식 성공:", decodedText);
+                resultElement.textContent = "스캔 성공! QR 코드: " + decodedText;
+
+                // QR 코드를 서버로 전송하여 로그인 요청
+                fetch('/login/qr', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ qrCode: decodedText })
+                }).then(response => {
+                    if (response.redirected) {
+                        window.location.href = response.url; // 성공하면 메뉴 페이지로 이동
+                    } else {
+                        alert("QR 코드가 유효하지 않습니다.");
+                    }
+                }).catch(error => console.error('오류 발생:', error));
+            }
+
+            function onScanFailure(error) {
+                console.warn("QR 코드 인식 실패:", error);
+            }
+
+            // QR 코드 스캔 시작
+            html5Qrcode.start(
+                { facingMode: "environment" }, // 카메라 설정
+                { fps: 10, qrbox: 250 }, // 옵션 설정
+                onScanSuccess, // 스캔 성공시 호출
+                onScanFailure  // 스캔 실패시 호출
+            ).catch(err => {
+                console.error("QR 코드 스캔 시작 오류:", err);
+            });
+        });
+    });
     </script>
 </body>
 </html>
