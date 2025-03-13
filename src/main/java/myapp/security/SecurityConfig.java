@@ -24,7 +24,7 @@ public class SecurityConfig {
             )
             .formLogin(form -> form
                 .loginPage("/login")
-                .defaultSuccessUrl("/home", true) // 로그인 성공 후 이동할 페이지
+                .defaultSuccessUrl("/menu", true) // 로그인 성공 후 이동할 페이지
                 .permitAll()
             )
             .logout(logout -> logout

@@ -3,10 +3,16 @@ package myapp.controller;
 import myapp.entity.UserData;
 import myapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpSession;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -66,33 +72,41 @@ public class LoginController {
         return "QRlogin";
     }
     
-    // QR 코드 스캔 후 로그인 처리
-    @GetMapping("/qr-login/{id}")
-    public String loginWithQRCode(@PathVariable String id, Model model) {
-        Optional<UserData> user = userService.getUserByQRCode(id);
+    @PostMapping("/qr")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> qrLogin(@RequestBody Map<String, String> requestBody, HttpSession session) {
+        String qrCode = requestBody.get("qrCode");
+        System.out.println("받은 QR 코드 값: " + qrCode);
+        
+        Map<String, Object> response = new HashMap<>();
+        Optional<UserData> user = userService.getUserByQRCode(qrCode);
+        
         if (user.isPresent()) {
-            model.addAttribute("message", "로그인 성공! ID: " + id);
-            return "login_success"; // 로그인 성공 화면
+            session.setAttribute("user", user.get());
+            response.put("success", true);
+            response.put("redirectUrl", "/menu");
+            return ResponseEntity.ok(response);
         } else {
-            model.addAttribute("message", "QR 코드가 유효하지 않습니다.");
-            return "qr_login";
+            response.put("success", false);
+            response.put("message", "QR 코드가 유효하지 않습니다.");
+            return ResponseEntity.status(401).body(response);
         }
     }
-    
-    @PostMapping("/login/qr")
-    public String loginWithQR(@RequestParam String qrCode, Model model) {
-        Optional<UserData> user = userService.getUserByQRCode(qrCode);
-        if (user.isPresent()) {
-            // QR 코드로 찾은 사용자 정보를 세션에 저장하여 로그인 처리
-            UserData loggedInUser = user.get();
-            model.addAttribute("user", loggedInUser);
-            
-            // 바로 메뉴 페이지로 이동
-            return "redirect:/menu";
+
+
+    @GetMapping("/check-session")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> checkSession(HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        UserData user = (UserData) session.getAttribute("user");
+
+        if (user != null) {
+            response.put("loggedIn", true);
+            response.put("username", user.getUsername());
+        } else {
+            response.put("loggedIn", false);
         }
 
-        //로그인 실패 시 QR 로그인 페이지로 다시 이동
-        model.addAttribute("loginError", "QR 코드가 유효하지 않습니다.");
-        return "QRlogin";
+        return ResponseEntity.ok(response);
     }
 }

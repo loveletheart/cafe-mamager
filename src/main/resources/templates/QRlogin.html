@@ -40,7 +40,7 @@
     <p id="result">QR 코드를 스캔하세요.</p>
     <button id="start-btn">QR 스캐너 시작</button>
 
-    <!-- html5-qrcode 라이브러리 추가 (최신 버전) -->
+    <!-- html5-qrcode 라이브러리 추가 -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
 	<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
  	
@@ -50,43 +50,58 @@
         const resultElement = document.getElementById("result");
 
         startButton.addEventListener("click", function () {
-            // html5Qrcode 인스턴스 생성
             const html5Qrcode = new Html5Qrcode("reader");
 
-            // 스캔 성공 및 실패 콜백 함수
             function onScanSuccess(decodedText, decodedResult) {
-                console.log("QR 인식 성공:", decodedText);
-                resultElement.textContent = "스캔 성공! QR 코드: " + decodedText;
 
-                // QR 코드를 서버로 전송하여 로그인 요청
-                fetch('/login/qr', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams({ qrCode: decodedText })
-                }).then(response => {
-                    if (response.redirected) {
-                        window.location.href = response.url; // 성공하면 메뉴 페이지로 이동
+                // 서버에 QR 코드 전송
+                fetch('/qr', {
+				    method: 'POST',
+				    headers: { 'Content-Type': 'application/json' },
+				    body: JSON.stringify({ qrCode: decodedText }), // ✅ JSON 형식으로 전송
+				    credentials: 'include'
+				}).then(response => {
+                    console.log("🔹 응답 상태 코드:", response.status);
+                    return response.json();
+                }).then(data => {
+                    console.log("✅ 서버 응답 데이터:", data);
+                    if (data.success) {
+                        window.location.href = data.redirectUrl;
                     } else {
-                        alert("QR 코드가 유효하지 않습니다.");
+                    	 window.location.href = "/error?msg=" + encodeURIComponent(data.message);
                     }
-                }).catch(error => console.error('오류 발생:', error));
+                }).catch(error => window.location.href = "/error?msg=" + encodeURIComponent(error));
             }
+
 
             function onScanFailure(error) {
                 console.warn("QR 코드 인식 실패:", error);
             }
 
-            // QR 코드 스캔 시작
             html5Qrcode.start(
-                { facingMode: "environment" }, // 카메라 설정
-                { fps: 10, qrbox: 250 }, // 옵션 설정
-                onScanSuccess, // 스캔 성공시 호출
-                onScanFailure  // 스캔 실패시 호출
-            ).catch(err => {
-                console.error("QR 코드 스캔 시작 오류:", err);
-            });
+                { facingMode: "environment" },
+                { fps: 10, qrbox: 250 },
+                onScanSuccess,
+                onScanFailure
+            ).catch(err => console.error("QR 코드 스캔 시작 오류:", err));
         });
     });
+
+
+        // 로그인 세션 확인 (자동 리다이렉트)
+        function checkSession() {
+		    fetch('/check-session')
+		        .then(response => response.json())
+		        .then(data => {
+		            if (data.loggedIn) {
+		                console.log("✅ 로그인 성공! 사용자:", data.username);
+		                window.location.href = "/menu"; // 메뉴 페이지로 이동
+		            } else {
+		                console.warn("❌ 세션이 유지되지 않음.");
+		            }
+		        })
+		        .catch(error => console.error("세션 확인 중 오류:", error));
+		}
     </script>
 </body>
 </html>

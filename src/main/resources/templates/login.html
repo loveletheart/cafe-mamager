@@ -63,20 +63,29 @@
 <body>
     <div class="login-wrapper">
         <h2>Login</h2>
-        <form method="post" action="/login" id="login-form">
+        <form method="post" th:action="@{/login}" id="login-form">
+		    <!-- CSRF token -->
 		    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-		    <input type="text" name="id" placeholder="id" required>
-		    <input type="password" name="password" placeholder="Password" required>
+		
+		    <!-- ID와 Password 입력 필드 -->
+		    <input type="text" name="username" placeholder="아이디" required>
+		    <input type="password" name="password" placeholder="비밀번호" required>
+		
+		    <!-- 아이디 저장 체크박스 -->
 		    <label for="remember-check">
 		        <input type="checkbox" id="remember-check" name="remember-me"> 아이디 저장하기
 		    </label>
-		    <input type="submit" value="Login">
+		
+		    <!-- 로그인 버튼 -->
+		    <input type="submit" value="로그인">
 		</form>
-        
-        <!-- QR 로그인 버튼 추가 -->
-        <a th:href="@{/QRlogin}" class="qr-login-btn">QR로 로그인하기</a>
+		
+		<!-- QR 로그인 버튼 -->
+		<a th:href="@{/QRlogin}" class="qr-login-btn">QR로 로그인하기</a>
+		
+		<!-- 회원가입 페이지 링크 -->
+		<p>회원가입페이지 <a th:href="@{/register}">회원가입하기</a></p>
 
-        <p>회원가입페이지 <a th:href="@{/register}">회원가입하기</a></p>
     </div>
 </body>
 </html>

@@ -2,11 +2,6 @@ package myapp.service;
 
 import myapp.entity.UserData;
 import myapp.repository.UserRepository;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.MultiFormatWriter;
-import com.google.zxing.WriterException;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,14 +9,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Base64;
 import java.util.Optional;
 
 @Service
 public class UserService implements UserDetailsService {
-
     @Autowired
     private UserRepository userRepository;
 
@@ -34,6 +25,7 @@ public class UserService implements UserDetailsService {
     // 로그인 시 호출됨. 전달받은 id를 이용하여 사용자 정보를 조회함.
     @Override
     public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
+    	System.out.println("서비스에서 받은 ID 값: " + id);  // 받은 ID 출력
         return userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + id));
     }
