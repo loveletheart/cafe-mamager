@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.util.HashMap;
@@ -74,25 +75,27 @@ public class LoginController {
     
     @PostMapping("/qr")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> qrLogin(@RequestBody Map<String, String> requestBody, HttpSession session) {
-        String qrCode = requestBody.get("qrCode");
-        System.out.println("받은 QR 코드 값: " + qrCode);
-        
-        Map<String, Object> response = new HashMap<>();
+    public ResponseEntity<Map<String, Object>> qrLogin(@RequestParam String qrCode, HttpSession session, HttpServletResponse response) {
+        System.out.println("📌 서버에서 받은 QR 코드: " + qrCode); // QR 코드 값 확인
+
+        Map<String, Object> responseMap = new HashMap<>();
         Optional<UserData> user = userService.getUserByQRCode(qrCode);
-        
-        if (user.isPresent()) {
+
+        if (user.isPresent()) { // ✅ Optional 값이 존재하는지 확인
             session.setAttribute("user", user.get());
-            response.put("success", true);
-            response.put("redirectUrl", "/menu");
-            return ResponseEntity.ok(response);
+            System.out.println("✅ 로그인 성공: " + user.get().getUsername()); // 로그인 성공 로그
+            responseMap.put("success", true);
+            responseMap.put("redirectUrl", "/menu");
+
+            // 서버 측에서 리디렉션을 처리할 수 있음
+            response.setStatus(HttpServletResponse.SC_OK);
+            return ResponseEntity.ok(responseMap);
         } else {
-            response.put("success", false);
-            response.put("message", "QR 코드가 유효하지 않습니다.");
-            return ResponseEntity.status(401).body(response);
+            responseMap.put("success", false);
+            responseMap.put("message", "QR 코드가 유효하지 않습니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMap);
         }
     }
-
 
     @GetMapping("/check-session")
     @ResponseBody

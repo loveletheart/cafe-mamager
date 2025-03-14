@@ -19,7 +19,7 @@ public class SecurityConfig {
                 .anyRequest().requiresSecure() // 모든 요청을 HTTPS로 강제 리디렉션
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/register", "/QRlogin").permitAll()
+                .requestMatchers("/login", "/register", "/QRlogin","/qr").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

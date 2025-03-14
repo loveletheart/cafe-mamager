@@ -33,6 +33,8 @@
             margin-top: 15px;
         }
     </style>
+    <meta name="_csrf" th:content="${_csrf.token}" />
+	<meta name="_csrf_header" th:content="${_csrf.headerName}" />
 </head>
 <body>
     <h1>QR 로그인</h1>
@@ -46,37 +48,43 @@
  	
     <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const startButton = document.getElementById("start-btn");
-        const resultElement = document.getElementById("result");
+    	const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    	const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-        startButton.addEventListener("click", function () {
-            const html5Qrcode = new Html5Qrcode("reader");
+	    document.getElementById("start-btn").addEventListener("click", function () {
+	        const html5Qrcode = new Html5Qrcode("reader");
 
-            function onScanSuccess(decodedText, decodedResult) {
+	        function onScanSuccess(decodedText) {
+	            alert("✅ 스캔 성공! QR 코드 값: " + decodedText);
 
-                // 서버에 QR 코드 전송
-                fetch('/qr', {
-				    method: 'POST',
-				    headers: { 'Content-Type': 'application/json' },
-				    body: JSON.stringify({ qrCode: decodedText }), // ✅ JSON 형식으로 전송
-				    credentials: 'include'
-				}).then(response => {
-                    console.log("🔹 응답 상태 코드:", response.status);
-                    return response.json();
-                }).then(data => {
-                    console.log("✅ 서버 응답 데이터:", data);
-                    if (data.success) {
-                        window.location.href = data.redirectUrl;
-                    } else {
-                    	 window.location.href = "/error?msg=" + encodeURIComponent(data.message);
-                    }
-                }).catch(error => window.location.href = "/error?msg=" + encodeURIComponent(error));
-            }
+	            fetch('/qr', {
+	                method: 'POST',
+	                headers: {
+	                    'Content-Type': 'application/x-www-form-urlencoded',
+	                    [csrfHeader]: csrfToken  // ✅ CSRF 토큰 추가
+	                },
+	                body: new URLSearchParams({ qrCode: String(decodedText) }),
+	                credentials: 'include'  // ✅ 세션 유지
+	            })
+	            .then(response => {
+	                alert("✅ 서버 응답 상태 코드: " + response.status);
+	                return response.json();
+	            })
+	            .then(data => {
+	                alert("✅ 서버 응답 데이터: " + JSON.stringify(data));
+	                if (data.success) {
+	                    alert("✅ 로그인 성공! 메뉴 페이지로 이동합니다.");
+	                    window.location.href = data.redirectUrl;
+	                } else {
+	                    alert("❌ 로그인 실패: " + data.message);
+	                }
+	            })
+	            .catch(error => alert("❌ 요청 실패: " + error));
+	        }
 
-
-            function onScanFailure(error) {
-                console.warn("QR 코드 인식 실패:", error);
-            }
+	        function onScanFailure(error) {
+	            console.warn("QR 코드 인식 실패:", error);
+	        }
 
             html5Qrcode.start(
                 { facingMode: "environment" },
