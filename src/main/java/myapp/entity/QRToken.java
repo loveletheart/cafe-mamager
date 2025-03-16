@@ -1,41 +1,44 @@
 package myapp.entity;
 
-import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 
 @Entity
 @Table(name = "qr_tokens")
 public class QRToken {
 
     @Id
-    private String token;  // UUID 기반 QR 코드 토큰
+    @Column(nullable = false, unique = true)
+    private String token;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserData user;  // UserData와 연결 (FK)
+    @Column(nullable = false, unique = true)
+    private String userId;
 
-    private LocalDateTime createdAt;  // QR 코드 생성 시간
-
-    // 기본 생성자
+    // 기본 생성자 (JPA용)
     public QRToken() {}
 
-    // 생성자
-    public QRToken(String token, UserData user) {
+    // 추가: (String token, String userId) 생성자
+    public QRToken(String token, String userId) {
         this.token = token;
-        this.user = user;
-        this.createdAt = LocalDateTime.now(); // 생성 시간 저장
+        this.userId = userId;
     }
 
-    // Getter
+    // Getter & Setter
     public String getToken() {
         return token;
     }
 
-    public UserData getUser() {
-        return user;
+    public void setToken(String token) {
+        this.token = token;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

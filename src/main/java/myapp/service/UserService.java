@@ -19,7 +19,7 @@ public class UserService implements UserDetailsService {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private QRTokenService qrTokenService; // QR 토큰 서비스 추가
+    private QRCodeloginService qrCodeloginService; // QR 토큰 서비스 추가
 
     // 로그인 시 호출됨. 전달받은 ID를 이용하여 사용자 정보 조회
     @Override
@@ -27,6 +27,11 @@ public class UserService implements UserDetailsService {
         System.out.println("서비스에서 받은 ID 값: " + id);
         return userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + id));
+    }
+    
+    //qr코드로 로그인시 사용사 정보 조회
+    public UserData findUserById(String userId) {
+        return userRepository.findById(userId).orElse(null);
     }
 
     // 회원가입 시 QR 코드 자동 생성
@@ -36,13 +41,10 @@ public class UserService implements UserDetailsService {
         }
 
         String encodedPassword = passwordEncoder.encode(password);
-        UserData newUser = new UserData(id, username, encodedPassword, role, null);
+        String qrToken = qrCodeloginService.generateQRCode(id); // QR 토큰 생성
+
+        UserData newUser = new UserData(id, username, encodedPassword, role, qrToken);
         userRepository.save(newUser);
-
-        // QR 토큰 자동 생성
-        String qrToken = qrTokenService.createToken(newUser);
-        System.out.println("생성된 QR 토큰: " + qrToken);
-
         return true;
     }
 }

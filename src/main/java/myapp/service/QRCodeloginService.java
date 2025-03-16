@@ -27,17 +27,18 @@ public class QRCodeloginService {
     public QRTokenService qrTokenService;
     
     //회원가입시 QR코드 자동생성
-    public String generateQRCode(UserData userId) {
+    public String generateQRCode(String id) {
         try {
-            String token = qrTokenService.createToken(userId); // 토큰 생성
-            String qrFileName = userId + "_qr.png";
+            String token = qrTokenService.createToken(id); // 토큰 생성
+            String qrLoginUrl = "https://192.168.0.8:8443/QRlogin?token=" + token;
+            String qrFileName = id + "_qr.png";
             String filePath = QR_CODE_PATH + qrFileName;
-
+            
             QRCodeWriter qrCodeWriter = new QRCodeWriter();
             Map<EncodeHintType, Object> hints = new HashMap<>();
             hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
 
-            BitMatrix bitMatrix = qrCodeWriter.encode(token, BarcodeFormat.QR_CODE, 200, 200, hints);
+            BitMatrix bitMatrix = qrCodeWriter.encode(qrLoginUrl, BarcodeFormat.QR_CODE, 200, 200, hints);
             Path path = FileSystems.getDefault().getPath(filePath);
             MatrixToImageWriter.writeToPath(bitMatrix, "PNG", path);
 

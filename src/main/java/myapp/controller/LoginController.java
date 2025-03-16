@@ -1,6 +1,7 @@
 package myapp.controller;
 
 import myapp.entity.UserData;
+import myapp.repository.UserRepository;
 import myapp.service.QRTokenService;
 import myapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -27,6 +29,8 @@ public class LoginController {
     private UserService userService;
     @Autowired
     public QRTokenService qrTokenService;
+    @Autowired
+    public UserRepository userRepository; 
 
     @GetMapping("/login")
     public String showLoginPage(@RequestParam(value = "error", required = false) String error,
@@ -71,21 +75,24 @@ public class LoginController {
     }
     
     /**
-     * qr로그인페이지를 보여줍니다
+     * QR코드 촬여후 로그인정보가 일치한다면 아이디값으로 로그인후,바로 메뉴판을 보여줍니다
      */
-    @PostMapping("/QRlogin")
-    public ResponseEntity<?> loginWithQR(@RequestParam String token, HttpServletRequest request) {
-        UserData userId = qrTokenService.getUserByToken(token);
-
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid QR token");
+    @GetMapping("/QRlogin")
+    public void loginWithQR(@RequestParam String token, HttpSession session, HttpServletResponse response) throws IOException {
+        UserData user = qrTokenService.getUserByToken(token);
+        
+        if (user == null) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "QR 코드가 유효하지 않습니다.");
+            return;
         }
-
-        UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
-        UsernamePasswordAuthenticationToken authToken =
-                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authToken);
-
-        return ResponseEntity.ok("Login success");
+        
+        UsernamePasswordAuthenticationToken auth =
+                new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth); // 인증 설정
+        session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext()); // 세션에 인증 정보 저장
+        
+        // 로그인 후 /menu로 리디렉션
+        response.sendRedirect("/menu");
     }
+
 }
