@@ -76,7 +76,7 @@ public class LoginController {
     }
     
     /**
-     * qr인식시 qr의 값을 전달
+     * qr인식시 qr의 값을 전달하여 로그인함
      */
     @PostMapping("/qr")
     @ResponseBody
@@ -102,22 +102,5 @@ public class LoginController {
             response.put("message", "QR 코드가 유효하지 않습니다.");
             return ResponseEntity.status(401).body(response);
         }
-    }
-
-
-    @GetMapping("/check-session")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> checkSession(HttpSession session) {
-        Map<String, Object> response = new HashMap<>();
-        UserData user = (UserData) session.getAttribute("user");
-
-        if (user != null) {
-            response.put("loggedIn", true);
-            response.put("username", user.getUsername());
-        } else {
-            response.put("loggedIn", false);
-        }
-
-        return ResponseEntity.ok(response);
     }
 }
