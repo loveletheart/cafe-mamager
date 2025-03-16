@@ -55,7 +55,6 @@
 	        const html5Qrcode = new Html5Qrcode("reader");
 
 	        function onScanSuccess(decodedText) {
-	            alert("✅ 스캔 성공! QR 코드 값: " + decodedText);
 
 	            fetch('/qr', {
 	                method: 'POST',
@@ -67,13 +66,11 @@
 	                credentials: 'include'  // ✅ 세션 유지
 	            })
 	            .then(response => {
-	                alert("✅ 서버 응답 상태 코드: " + response.status);
 	                return response.json();
 	            })
 	            .then(data => {
-	                alert("✅ 서버 응답 데이터: " + JSON.stringify(data));
 	                if (data.success) {
-	                    alert("✅ 로그인 성공! 메뉴 페이지로 이동합니다.");
+	                	alert("✅ 로그인 성공! 메뉴 페이지로 이동합니다.");
 	                    window.location.href = data.redirectUrl;
 	                } else {
 	                    alert("❌ 로그인 실패: " + data.message);

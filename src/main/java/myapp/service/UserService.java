@@ -46,6 +46,6 @@ public class UserService implements UserDetailsService {
 
     // QR 코드로 사용자 조회
     public Optional<UserData> getUserByQRCode(String qrCode) {
-        return userRepository.findByQrCode(qrCode);
+        return userRepository.findById(qrCode);
     }
 }

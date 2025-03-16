@@ -5,6 +5,8 @@ import myapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -73,29 +75,35 @@ public class LoginController {
         return "QRlogin";
     }
     
+    /**
+     * qr인식시 qr의 값을 전달
+     */
     @PostMapping("/qr")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> qrLogin(@RequestParam String qrCode, HttpSession session, HttpServletResponse response) {
-        System.out.println("📌 서버에서 받은 QR 코드: " + qrCode); // QR 코드 값 확인
+    public ResponseEntity<Map<String, Object>> qrLogin(@RequestParam String qrCode, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
 
-        Map<String, Object> responseMap = new HashMap<>();
-        Optional<UserData> user = userService.getUserByQRCode(qrCode);
+        Optional<UserData> userOptional = userService.getUserByQRCode(qrCode);
+        if (userOptional.isPresent()) {
+            UserData user = userOptional.get();
+            
+            // Spring Security 인증 객체 생성
+            UsernamePasswordAuthenticationToken auth = 
+                new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
 
-        if (user.isPresent()) { // ✅ Optional 값이 존재하는지 확인
-            session.setAttribute("user", user.get());
-            System.out.println("✅ 로그인 성공: " + user.get().getUsername()); // 로그인 성공 로그
-            responseMap.put("success", true);
-            responseMap.put("redirectUrl", "/menu");
+            SecurityContextHolder.getContext().setAuthentication(auth); // 인증 설정
+            session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext()); // 세션에 인증 정보 저장
 
-            // 서버 측에서 리디렉션을 처리할 수 있음
-            response.setStatus(HttpServletResponse.SC_OK);
-            return ResponseEntity.ok(responseMap);
+            response.put("success", true);
+            response.put("redirectUrl", "/menu"); 
+            return ResponseEntity.ok(response);
         } else {
-            responseMap.put("success", false);
-            responseMap.put("message", "QR 코드가 유효하지 않습니다.");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMap);
+            response.put("success", false);
+            response.put("message", "QR 코드가 유효하지 않습니다.");
+            return ResponseEntity.status(401).body(response);
         }
     }
+
 
     @GetMapping("/check-session")
     @ResponseBody
