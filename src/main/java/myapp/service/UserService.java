@@ -9,43 +9,40 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 public class UserService implements UserDetailsService {
+
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-    
-    @Autowired
-    private QRCodeloginService qrCodeloginService;
 
-    // 로그인 시 호출됨. 전달받은 id를 이용하여 사용자 정보를 조회함.
+    @Autowired
+    private QRTokenService qrTokenService; // QR 토큰 서비스 추가
+
+    // 로그인 시 호출됨. 전달받은 ID를 이용하여 사용자 정보 조회
     @Override
     public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
-    	System.out.println("서비스에서 받은 ID 값: " + id);  // 받은 ID 출력
+        System.out.println("서비스에서 받은 ID 값: " + id);
         return userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + id));
     }
 
-    // 회원가입: 입력된 id와 rawPassword를 받아서 저장 (비밀번호 암호화)
+    // 회원가입 시 QR 코드 자동 생성
     public boolean registerUser(String id, String password, String username, String role) {
         if (userRepository.findById(id).isPresent()) {
             return false; // 이미 존재하는 ID
         }
 
         String encodedPassword = passwordEncoder.encode(password);
-        String qrCodePath = qrCodeloginService.generateQRCode(id); // QR 코드 생성
-
-        UserData newUser = new UserData(id, username, encodedPassword, role, qrCodePath);
+        UserData newUser = new UserData(id, username, encodedPassword, role, null);
         userRepository.save(newUser);
-        return true;
-    }
 
-    // QR 코드로 사용자 조회
-    public Optional<UserData> getUserByQRCode(String qrCode) {
-        return userRepository.findById(qrCode);
+        // QR 토큰 자동 생성
+        String qrToken = qrTokenService.createToken(newUser);
+        System.out.println("생성된 QR 토큰: " + qrToken);
+
+        return true;
     }
 }

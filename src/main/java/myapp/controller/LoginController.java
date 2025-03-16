@@ -1,6 +1,7 @@
 package myapp.controller;
 
 import myapp.entity.UserData;
+import myapp.service.QRTokenService;
 import myapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
@@ -23,6 +25,8 @@ public class LoginController {
 	
     @Autowired
     private UserService userService;
+    @Autowired
+    public QRTokenService qrTokenService;
 
     @GetMapping("/login")
     public String showLoginPage(@RequestParam(value = "error", required = false) String error,
@@ -69,38 +73,19 @@ public class LoginController {
     /**
      * qr로그인페이지를 보여줍니다
      */
-    @GetMapping("/QRlogin")
-    public String showQRLoginPage(Model model) {
-        model.addAttribute("ids", new int[]{1, 2, 3, 4, 5}); // 샘플 ID 리스트
-        return "QRlogin";
-    }
-    
-    /**
-     * qr인식시 qr의 값을 전달하여 로그인함
-     */
-    @PostMapping("/qr")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> qrLogin(@RequestParam String qrCode, HttpSession session) {
-        Map<String, Object> response = new HashMap<>();
+    @PostMapping("/QRlogin")
+    public ResponseEntity<?> loginWithQR(@RequestParam String token, HttpServletRequest request) {
+        UserData userId = qrTokenService.getUserByToken(token);
 
-        Optional<UserData> userOptional = userService.getUserByQRCode(qrCode);
-        if (userOptional.isPresent()) {
-            UserData user = userOptional.get();
-            
-            // Spring Security 인증 객체 생성
-            UsernamePasswordAuthenticationToken auth = 
-                new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-
-            SecurityContextHolder.getContext().setAuthentication(auth); // 인증 설정
-            session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext()); // 세션에 인증 정보 저장
-
-            response.put("success", true);
-            response.put("redirectUrl", "/menu"); 
-            return ResponseEntity.ok(response);
-        } else {
-            response.put("success", false);
-            response.put("message", "QR 코드가 유효하지 않습니다.");
-            return ResponseEntity.status(401).body(response);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid QR token");
         }
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
+        UsernamePasswordAuthenticationToken authToken =
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authToken);
+
+        return ResponseEntity.ok("Login success");
     }
 }
