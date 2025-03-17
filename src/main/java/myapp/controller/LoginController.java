@@ -75,24 +75,36 @@ public class LoginController {
     }
     
     /**
+     * QR코드 촬여후 보안을 위해 html로 들어가서 post요청을한다.
+     */
+    @GetMapping("/QRredirect")
+    public String qrRedirect(@RequestParam String token, Model model) {
+        model.addAttribute("token", token);
+        return "QRredirect"; // 자동 POST 요청을 수행할 HTML 페이지 반환
+    }
+    
+    /**
      * QR코드 촬여후 로그인정보가 일치한다면 아이디값으로 로그인후,바로 메뉴판을 보여줍니다
      */
-    @GetMapping("/QRlogin")
-    public void loginWithQR(@RequestParam String token, HttpSession session, HttpServletResponse response) throws IOException {
+    @PostMapping("/QRlogin")
+    public void loginWithQR(@RequestBody Map<String, String> requestData, 
+                            HttpSession session, 
+                            HttpServletResponse response) throws IOException {
+        String token = requestData.get("token"); // 요청에서 토큰 가져오기
         UserData user = qrTokenService.getUserByToken(token);
         
         if (user == null) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "QR 코드가 유효하지 않습니다.");
             return;
         }
-        
+
+        // Spring Security 인증 객체 생성
         UsernamePasswordAuthenticationToken auth =
                 new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(auth); // 인증 설정
+        SecurityContextHolder.getContext().setAuthentication(auth); // 인증 정보 저장
         session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext()); // 세션에 인증 정보 저장
-        
-        // 로그인 후 /menu로 리디렉션
+
+        // 로그인 성공 후 메뉴 페이지로 리디렉션
         response.sendRedirect("/menu");
     }
-
 }
