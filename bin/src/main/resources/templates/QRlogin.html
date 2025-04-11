@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR 로그인</title>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        #reader {
+            width: 300px;
+            margin: auto;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #6A24FE;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #5317D5;
+        }
+        #result {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+    </style>
+    <meta name="_csrf" th:content="${_csrf.token}" />
+	<meta name="_csrf_header" th:content="${_csrf.headerName}" />
+</head>
+<body>
+    <h1>QR 로그인</h1>
+    <div id="reader"></div>
+    <p id="result">QR 코드를 스캔하세요.</p>
+    <button id="start-btn">QR 스캐너 시작</button>
+
+    <!-- html5-qrcode 라이브러리 추가 -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+	<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+ 	
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+    	const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    	const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+	    document.getElementById("start-btn").addEventListener("click", function () {
+	        const html5Qrcode = new Html5Qrcode("reader");
+
+	        function onScanSuccess(decodedText) {
+
+	            fetch('/qr', {
+	                method: 'POST',
+	                headers: {
+	                    'Content-Type': 'application/x-www-form-urlencoded',
+	                    [csrfHeader]: csrfToken  // ✅ CSRF 토큰 추가
+	                },
+	                body: new URLSearchParams({ qrCode: String(decodedText) }),
+	                credentials: 'include'  // ✅ 세션 유지
+	            })
+	            .then(response => {
+	                return response.json();
+	            })
+	            .then(data => {
+	                if (data.success) {
+	                	alert("✅ 로그인 성공! 메뉴 페이지로 이동합니다.");
+	                    window.location.href = data.redirectUrl;
+	                } else {
+	                    alert("❌ 로그인 실패: " + data.message);
+	                }
+	            })
+	            .catch(error => alert("❌ 요청 실패: " + error));
+	        }
+
+	        function onScanFailure(error) {
+	            console.warn("QR 코드 인식 실패:", error);
+	        }
+
+            html5Qrcode.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: 250 },
+                onScanSuccess,
+                onScanFailure
+            ).catch(err => console.error("QR 코드 스캔 시작 오류:", err));
+        });
+    });
+    </script>
+</body>
+</html>
