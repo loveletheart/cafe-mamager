@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class ManagementApplication {
 	public static void main(String[] args) {
-		SpringApplication.run(ManagementApplication.class, args);//테스트
+		SpringApplication.run(ManagementApplication.class, args);//다시테스트
 	}
 
 }
