@@ -17,7 +17,7 @@ public class RedirectHttpToHttpsConfig {
             connector.setScheme("http");
             connector.setPort(8080); // HTTP 포트
             connector.setSecure(false);
-            connector.setRedirectPort(8443); // HTTPS 포트로 리디렉션
+            connector.setRedirectPort(8080); // HTTPS 포트로 리디렉션
             factory.addAdditionalTomcatConnectors(connector);
         };
     }

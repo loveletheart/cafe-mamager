@@ -1,5 +1,6 @@
 package myapp.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,6 +13,9 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+	
+	@Autowired
+    private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
 
 	@Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -25,7 +29,8 @@ public class SecurityConfig {
             )
             .formLogin(form -> form
                 .loginPage("/login")
-                .defaultSuccessUrl("/menu", true) // 로그인 성공 후 이동할 페이지
+                .loginProcessingUrl("/login")  // 로그인 요청을 처리하는 URL
+                .successHandler(customAuthenticationSuccessHandler) // 성공 핸들러 등록
                 .permitAll()
             )
             .logout(logout -> logout
