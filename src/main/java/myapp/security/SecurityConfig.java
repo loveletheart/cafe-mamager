@@ -22,14 +22,10 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-        	.requiresChannel(channel ->
-		        	channel
-		            .requestMatchers(r -> {
-		                String proto = r.getHeader("X-Forwarded-Proto");
-		                return proto != null && proto.equalsIgnoreCase("http");
-		            }).requiresSecure()
-		    )
+    	http
+	        .requiresChannel(channel ->
+	            channel.anyRequest().requiresSecure() // 모든 요청을 HTTPS로 리디렉션
+	        )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/register", "/QRlogin", "/QRredirect").permitAll()
                 .anyRequest().authenticated()
