@@ -23,11 +23,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .requiresChannel(channel ->
-                channel
-                    .requestMatchers(r -> "https".equals(r.getHeader("X-Forwarded-Proto")))
-                    .requiresSecure()
-            )
+        	.requiresChannel(channel ->
+		        	channel
+		            .requestMatchers(r -> {
+		                String proto = r.getHeader("X-Forwarded-Proto");
+		                return proto != null && proto.equalsIgnoreCase("http");
+		            }).requiresSecure()
+		    )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/register", "/QRlogin", "/QRredirect").permitAll()
                 .anyRequest().authenticated()
