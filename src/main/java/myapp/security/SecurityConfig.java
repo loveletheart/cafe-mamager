@@ -59,8 +59,9 @@ public class SecurityConfig {
     public WebServerFactoryCustomizer<TomcatServletWebServerFactory> tomcatCustomizer() {
         return factory -> {
             RemoteIpValve valve = new RemoteIpValve();
-            valve.setProtocolHeader("X-Forwarded-Proto"); // 리버스 프록시가 HTTPS를 썼는지 판단
+            valve.setProtocolHeader("X-Forwarded-Proto");
             valve.setProtocolHeaderHttpsValue("https");
+            valve.setPortHeader("X-Forwarded-Port");
             factory.addEngineValves(valve);
         };
     }
