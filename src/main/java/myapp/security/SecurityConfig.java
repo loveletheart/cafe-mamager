@@ -24,7 +24,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/register", "/QRlogin", "/QRredirect","/secure/**").permitAll()
+                .requestMatchers("/login", "/register", "/QRlogin", "/QRredirect").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -50,7 +50,7 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // 프록시 또는 포트 포워딩된 요청의 헤더 인식
+    // Remote IP Valve 설정: 프록시 헤더 인식
     @Bean
     public WebServerFactoryCustomizer<TomcatServletWebServerFactory> tomcatCustomizer() {
         return factory -> {
