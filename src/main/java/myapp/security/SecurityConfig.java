@@ -23,10 +23,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // HTTPS 강제 적용
-            .requiresChannel(channel -> 
-                channel.anyRequest().requiresSecure()
-            )
+	        .requiresChannel(channel -> channel
+	           .requestMatchers(r -> r.getHeader("X-Forwarded-Proto") != null).requiresSecure()
+	        )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/register", "/QRlogin", "/QRredirect").permitAll()
                 .anyRequest().authenticated()
@@ -59,8 +58,9 @@ public class SecurityConfig {
     public WebServerFactoryCustomizer<TomcatServletWebServerFactory> tomcatCustomizer() {
         return factory -> {
             RemoteIpValve valve = new RemoteIpValve();
-            valve.setProtocolHeader("X-Forwarded-Proto"); // 리버스 프록시가 HTTPS를 썼는지 판단
+            valve.setProtocolHeader("X-Forwarded-Proto");
             valve.setProtocolHeaderHttpsValue("https");
+            valve.setPortHeader("X-Forwarded-Port");
             factory.addEngineValves(valve);
         };
     }
