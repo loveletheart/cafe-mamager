@@ -24,7 +24,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/register", "/QRlogin", "/QRredirect").permitAll()
+                .requestMatchers("/login", "/register", "/QRlogin", "/QRredirect","/secure/**").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -57,7 +57,6 @@ public class SecurityConfig {
             RemoteIpValve valve = new RemoteIpValve();
             valve.setProtocolHeader("X-Forwarded-Proto");
             valve.setProtocolHeaderHttpsValue("https");
-            valve.setPortHeader("X-Forwarded-Port");
             factory.addEngineValves(valve);
         };
     }
