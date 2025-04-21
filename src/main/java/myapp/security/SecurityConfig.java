@@ -22,10 +22,11 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    	http
-	        .requiresChannel(channel ->
-	            channel.anyRequest().requiresSecure() // 모든 요청을 HTTPS로 리디렉션
-	        )
+        http
+            // HTTPS 강제 적용
+            .requiresChannel(channel -> 
+                channel.anyRequest().requiresSecure()
+            )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/register", "/QRlogin", "/QRredirect").permitAll()
                 .anyRequest().authenticated()
@@ -53,12 +54,12 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // Remote IP Valve 설정: 프록시 헤더 인식
+    // 프록시 또는 포트 포워딩된 요청의 헤더 인식
     @Bean
     public WebServerFactoryCustomizer<TomcatServletWebServerFactory> tomcatCustomizer() {
         return factory -> {
             RemoteIpValve valve = new RemoteIpValve();
-            valve.setProtocolHeader("X-Forwarded-Proto");
+            valve.setProtocolHeader("X-Forwarded-Proto"); // 리버스 프록시가 HTTPS를 썼는지 판단
             valve.setProtocolHeaderHttpsValue("https");
             factory.addEngineValves(valve);
         };

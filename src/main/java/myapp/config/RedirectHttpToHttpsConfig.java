@@ -13,12 +13,6 @@ public class RedirectHttpToHttpsConfig {
     @Bean
     public WebServerFactoryCustomizer<TomcatServletWebServerFactory> servletContainer() {
         return factory -> {
-            // 8080 포트용 커넥터
-            Connector connector1 = new Connector(Http11NioProtocol.class.getName());
-            connector1.setScheme("http");
-            connector1.setPort(8080);
-            connector1.setSecure(false);
-            connector1.setRedirectPort(8443); // HTTPS로 리디렉션
 
             // 8081 포트용 커넥터
             Connector connector2 = new Connector(Http11NioProtocol.class.getName());
@@ -27,7 +21,7 @@ public class RedirectHttpToHttpsConfig {
             connector2.setSecure(false);
             connector2.setRedirectPort(8443); // HTTPS로 리디렉션
 
-            factory.addAdditionalTomcatConnectors(connector1, connector2);
+            factory.addAdditionalTomcatConnectors(connector2);
         };
     }
 }
