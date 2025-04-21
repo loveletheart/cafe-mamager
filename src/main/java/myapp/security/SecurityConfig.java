@@ -23,10 +23,6 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // HTTPS 강제 적용
-            .requiresChannel(channel -> 
-                channel.anyRequest().requiresSecure()
-            )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/register", "/QRlogin", "/QRredirect").permitAll()
                 .anyRequest().authenticated()
